@@ -1,4 +1,5 @@
 const Secret = require("../models/secret.model");
+const Project = require("../models/project.model");
 const { decrypt } = require("../utils/encryption");
 const { logAudit } = require("../utils/audit");
 
@@ -13,6 +14,17 @@ exports.getRuntimeSecrets = async (req, res) => {
     return res
       .status(400)
       .json({ message: "projectId and environment are required" });
+  }
+
+  // Verify project belongs to the current user
+  const project = await Project.findOne({ 
+    _id: projectId, 
+    isActive: true, 
+    createdBy: req.user.id 
+  });
+
+  if (!project) {
+    return res.status(404).json({ message: "Project not found or access denied" });
   }
 
   const secrets = await Secret.find({ projectId, environment });

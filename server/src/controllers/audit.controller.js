@@ -2,7 +2,8 @@ const AuditLog = require("../models/audit-log.model");
 
 exports.listAuditLogs = async (req, res) => {
   try {
-    const logs = await AuditLog.find()
+    // Only return audit logs for the current user
+    const logs = await AuditLog.find({ userId: req.user.id })
       .sort({ createdAt: -1 })
       .limit(1000)
       .select("-__v");

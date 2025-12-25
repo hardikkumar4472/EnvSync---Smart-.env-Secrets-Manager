@@ -1,4 +1,5 @@
 const Secret = require("../models/secret.model");
+const Project = require("../models/project.model");
 const { encrypt, decrypt } = require("../utils/encryption");
 const { logAudit } = require("../utils/audit");
 
@@ -10,6 +11,17 @@ exports.createSecret = async (req, res) => {
 
   if (!projectId || !environment || !key || !value) {
     return res.status(400).json({ message: "All fields required" });
+  }
+
+  // Verify project belongs to the current user
+  const project = await Project.findOne({ 
+    _id: projectId, 
+    isActive: true, 
+    createdBy: req.user.id 
+  });
+
+  if (!project) {
+    return res.status(404).json({ message: "Project not found or access denied" });
   }
 
   // Check if secret with same key already exists for this project/environment
@@ -55,6 +67,17 @@ exports.listSecrets = async (req, res) => {
       .json({ message: "projectId and environment are required" });
   }
 
+  // Verify project belongs to the current user
+  const project = await Project.findOne({ 
+    _id: projectId, 
+    isActive: true, 
+    createdBy: req.user.id 
+  });
+
+  if (!project) {
+    return res.status(404).json({ message: "Project not found or access denied" });
+  }
+
   const secrets = await Secret.find(
     { projectId, environment },
     {
@@ -86,6 +109,17 @@ exports.getSecretValue = async (req, res) => {
 
   if (!secret) {
     return res.status(404).json({ message: "Secret not found" });
+  }
+
+  // Verify project belongs to the current user
+  const project = await Project.findOne({ 
+    _id: secret.projectId, 
+    isActive: true, 
+    createdBy: req.user.id 
+  });
+
+  if (!project) {
+    return res.status(404).json({ message: "Secret not found or access denied" });
   }
 
   const decryptedValue = decrypt(secret.encryptedValue);
@@ -125,6 +159,18 @@ exports.updateSecret = async (req, res) => {
 
     if (!secret) {
       return res.status(404).json({ message: "Secret not found" });
+    }
+
+    // Verify project belongs to the current user
+    const Project = require("../models/project.model");
+    const project = await Project.findOne({ 
+      _id: secret.projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Secret not found or access denied" });
     }
 
     // If updating key, check if new key already exists
@@ -184,6 +230,18 @@ exports.deleteSecret = async (req, res) => {
       return res.status(404).json({ message: "Secret not found" });
     }
 
+    // Verify project belongs to the current user
+    const Project = require("../models/project.model");
+    const project = await Project.findOne({ 
+      _id: secret.projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Secret not found or access denied" });
+    }
+
     const { projectId, environment, key } = secret;
 
     await Secret.findByIdAndDelete(secretId);
@@ -221,6 +279,18 @@ exports.bulkDeleteSecrets = async (req, res) => {
       return res.status(400).json({ 
         message: "Please confirm deletion by sending { confirm: 'DELETE' }" 
       });
+    }
+
+    // Verify project belongs to the current user
+    const Project = require("../models/project.model");
+    const project = await Project.findOne({ 
+      _id: projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found or access denied" });
     }
 
     const result = await Secret.deleteMany({ projectId, environment });
