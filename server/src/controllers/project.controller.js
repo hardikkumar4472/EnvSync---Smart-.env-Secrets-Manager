@@ -11,7 +11,8 @@ exports.createProject = async (req, res) => {
     return res.status(400).json({ message: "Project name is required" });
   }
 
-  const exists = await Project.findOne({ name });
+  // Check if project with same name exists for this user
+  const exists = await Project.findOne({ name, createdBy: req.user.id });
   if (exists) {
     return res.status(409).json({ message: "Project already exists" });
   }
@@ -19,6 +20,7 @@ exports.createProject = async (req, res) => {
   const project = await Project.create({
     name,
     description,
+    createdBy: req.user.id,
   });
 
   await logAudit({
@@ -37,8 +39,9 @@ exports.createProject = async (req, res) => {
  * Get all projects
  */
 exports.listProjects = async (req, res) => {
+  // Only return projects created by the current user
   const projects = await Project.find(
-    { isActive: true },
+    { isActive: true, createdBy: req.user.id },
     { name: 1, description: 1, createdAt: 1, updatedAt: 1, _id: 1 }
   ).sort({ createdAt: -1 });
 
@@ -55,9 +58,14 @@ exports.getProject = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    const project = await Project.findById(projectId);
+    // Only return project if it belongs to the current user
+    const project = await Project.findOne({ 
+      _id: projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
+    });
 
-    if (!project || !project.isActive) {
+    if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
@@ -87,15 +95,24 @@ exports.updateProject = async (req, res) => {
       return res.status(400).json({ message: "At least one field (name or description) is required" });
     }
 
-    const project = await Project.findById(projectId);
+    // Only allow update if project belongs to the current user
+    const project = await Project.findOne({ 
+      _id: projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
+    });
 
-    if (!project || !project.isActive) {
+    if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Check if new name already exists (if name is being changed)
+    // Check if new name already exists for this user (if name is being changed)
     if (name && name !== project.name) {
-      const exists = await Project.findOne({ name, _id: { $ne: projectId } });
+      const exists = await Project.findOne({ 
+        name, 
+        createdBy: req.user.id,
+        _id: { $ne: projectId } 
+      });
       if (exists) {
         return res.status(409).json({ message: "Project name already exists" });
       }
@@ -130,9 +147,14 @@ exports.deleteProject = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    const project = await Project.findById(projectId);
+    // Only allow delete if project belongs to the current user
+    const project = await Project.findOne({ 
+      _id: projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
+    });
 
-    if (!project || !project.isActive) {
+    if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
@@ -180,7 +202,11 @@ exports.permanentlyDeleteProject = async (req, res) => {
       });
     }
 
-    const project = await Project.findById(projectId);
+    // Only allow delete if project belongs to the current user
+    const project = await Project.findOne({ 
+      _id: projectId, 
+      createdBy: req.user.id 
+    });
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
