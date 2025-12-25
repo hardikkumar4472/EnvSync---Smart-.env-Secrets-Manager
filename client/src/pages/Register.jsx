@@ -32,7 +32,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://envsync-backend.onrender.com', {
+      const response = await fetch('https://envsync-backend.onrender.com/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
