@@ -15,7 +15,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       // Initialize socket connection
-      const newSocket = io('http://localhost:4000', {
+      const newSocket = io('https://envsync-sockets.onrender.com', {
         withCredentials: true,
       });
 

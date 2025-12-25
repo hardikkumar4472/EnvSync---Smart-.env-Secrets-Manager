@@ -5,7 +5,7 @@ let io;
 const initSocket = (server) => {
   io = socketIo(server, {
     cors: {
-      origin: ['http://localhost:5173', 'http://localhost:3000'],
+      origin: ['http://localhost:5173', 'http://localhost:3000', 'https://envsync-sockets.onrender.com'],
       methods: ['GET', 'POST'],
       credentials: true
     }
