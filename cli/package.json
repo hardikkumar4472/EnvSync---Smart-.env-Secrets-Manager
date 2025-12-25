@@ -1,5 +1,8 @@
 {
-  "name": "envsync",
+  "name": "@hardik010190/envsync",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.0.0",
   "bin": {
     "envsync": "bin/envsync.js"

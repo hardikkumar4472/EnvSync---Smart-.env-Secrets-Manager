@@ -105,14 +105,14 @@ const Dashboard = () => {
     <div className="space-y-4">
       {/* Header */}
       <div className="fade-in">
-        <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>Dashboard</h1>
-        <p style={{color: 'var(--color-text-light)'}}>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>Dashboard</h1>
+        <p className="text-sm md:text-base" style={{color: 'var(--color-text-light)'}}>
           Welcome to EnvSync Admin Dashboard. Manage your secrets securely.
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (

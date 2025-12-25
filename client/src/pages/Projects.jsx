@@ -102,20 +102,20 @@ const Projects = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>Projects</h1>
-          <p style={{color: 'var(--color-text-light)'}}>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>Projects</h1>
+          <p className="text-sm md:text-base" style={{color: 'var(--color-text-light)'}}>
             Manage your application projects and their secrets
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center space-x-2 text-white px-6 py-3 rounded-lg transition-all shadow-md gradient-primary"
+          className="w-full md:w-auto flex items-center justify-center space-x-2 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg transition-all shadow-md gradient-primary text-sm md:text-base"
           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4 md:w-5 md:h-5" />
           <span>New Project</span>
         </button>
       </div>

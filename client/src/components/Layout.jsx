@@ -152,7 +152,7 @@ const Layout = () => {
       <div className="lg:pl-64 h-full flex flex-col">
         {/* Top Bar */}
         <header className="shadow-sm border-b sticky top-0 z-30" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden transition-colors"
@@ -196,7 +196,7 @@ const Layout = () => {
         </header>
 
         {/* Page Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto p-6" style={{backgroundColor: 'var(--color-bg-light)'}}>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6" style={{backgroundColor: 'var(--color-bg-light)'}}>
           <Outlet />
         </main>
       </div>
