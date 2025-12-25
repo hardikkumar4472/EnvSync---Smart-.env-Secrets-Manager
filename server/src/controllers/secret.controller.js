@@ -7,92 +7,102 @@ const { logAudit } = require("../utils/audit");
  * Create a new secret
  */
 exports.createSecret = async (req, res) => {
-  const { projectId, environment, key, value } = req.body;
+  try {
+    const { projectId, environment, key, value } = req.body;
 
-  if (!projectId || !environment || !key || !value) {
-    return res.status(400).json({ message: "All fields required" });
-  }
+    if (!projectId || !environment || !key || !value) {
+      return res.status(400).json({ message: "All fields required" });
+    }
 
-  // Verify project belongs to the current user
-  const project = await Project.findOne({ 
-    _id: projectId, 
-    isActive: true, 
-    createdBy: req.user.id 
-  });
-
-  if (!project) {
-    return res.status(404).json({ message: "Project not found or access denied" });
-  }
-
-  // Check if secret with same key already exists for this project/environment
-  const exists = await Secret.findOne({ projectId, environment, key });
-  if (exists) {
-    return res.status(409).json({ 
-      message: "Secret with this key already exists for this project and environment" 
+    // Verify project belongs to the current user
+    const project = await Project.findOne({ 
+      _id: projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
     });
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found or access denied" });
+    }
+
+    // Check if secret with same key already exists for this project/environment
+    const exists = await Secret.findOne({ projectId, environment, key });
+    if (exists) {
+      return res.status(409).json({ 
+        message: "Secret with this key already exists for this project and environment" 
+      });
+    }
+
+    const encrypted = encrypt(value);
+    const secret = await Secret.create({
+      projectId,
+      environment,
+      key,
+      encryptedValue: encrypted,
+      createdBy: req.user.id,
+    });
+
+    await logAudit({
+      user: req.user,
+      action: "SECRET_CREATE",
+      projectId,
+      environment,
+      ipAddress: req.ip,
+    });
+
+    res.status(201).json({
+      message: "Secret stored securely",
+      secretId: secret._id,
+    });
+  } catch (error) {
+    console.error("Error creating secret:", error);
+    res.status(500).json({ message: "Error creating secret", error: error.message });
   }
-
-  const encrypted = encrypt(value);
-  const secret = await Secret.create({
-    projectId,
-    environment,
-    key,
-    encryptedValue: encrypted,
-    createdBy: req.user.id,
-  });
-
-  await logAudit({
-    user: req.user,
-    action: "SECRET_CREATE",
-    projectId,
-    environment,
-    ipAddress: req.ip,
-  });
-
-  res.status(201).json({
-    message: "Secret stored securely",
-    secretId: secret._id,
-  });
 };
 
 /**
  * List all secrets for a project/environment
  */
 exports.listSecrets = async (req, res) => {
-  const { projectId, environment } = req.query;
+  try {
+    const { projectId, environment } = req.query;
 
-  if (!projectId || !environment) {
-    return res
-      .status(400)
-      .json({ message: "projectId and environment are required" });
-  }
-
-  // Verify project belongs to the current user
-  const project = await Project.findOne({ 
-    _id: projectId, 
-    isActive: true, 
-    createdBy: req.user.id 
-  });
-
-  if (!project) {
-    return res.status(404).json({ message: "Project not found or access denied" });
-  }
-
-  const secrets = await Secret.find(
-    { projectId, environment },
-    {
-      key: 1,
-      environment: 1,
-      projectId: 1,
-      createdAt: 1,
-      updatedAt: 1,
+    if (!projectId || !environment) {
+      return res
+        .status(400)
+        .json({ message: "projectId and environment are required" });
     }
-  ).sort({ createdAt: -1 });
 
-  res.json({
-    count: secrets.length,
-    secrets,
-  });
+    // Verify project belongs to the current user
+    const project = await Project.findOne({ 
+      _id: projectId, 
+      isActive: true, 
+      createdBy: req.user.id 
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found or access denied" });
+    }
+
+    const secrets = await Secret.find(
+      { projectId, environment },
+      {
+        key: 1,
+        environment: 1,
+        projectId: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      }
+    ).sort({ createdAt: -1 });
+
+    res.json({
+      count: secrets.length,
+      secrets,
+    });
+  } catch (error) {
+    console.error("Error listing secrets:", error);
+    res.status(500).json({ message: "Error fetching secrets", error: error.message });
+  }
 };
 
 /**

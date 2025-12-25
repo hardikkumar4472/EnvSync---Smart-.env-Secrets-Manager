@@ -6,49 +6,59 @@ const { logAudit } = require("../utils/audit");
  * Create a new project
  */
 exports.createProject = async (req, res) => {
-  const { name, description } = req.body;
-  if (!name) {
-    return res.status(400).json({ message: "Project name is required" });
+  try {
+    const { name, description } = req.body;
+    if (!name) {
+      return res.status(400).json({ message: "Project name is required" });
+    }
+
+    // Check if project with same name exists for this user
+    const exists = await Project.findOne({ name, createdBy: req.user.id });
+    if (exists) {
+      return res.status(409).json({ message: "Project already exists" });
+    }
+
+    const project = await Project.create({
+      name,
+      description,
+      createdBy: req.user.id,
+    });
+
+    await logAudit({
+      user: req.user,
+      action: "PROJECT_CREATE",
+      ipAddress: req.ip,
+    });
+
+    res.status(201).json({
+      message: "Project created",
+      project,
+    });
+  } catch (error) {
+    console.error("Error creating project:", error);
+    res.status(500).json({ message: "Error creating project", error: error.message });
   }
-
-  // Check if project with same name exists for this user
-  const exists = await Project.findOne({ name, createdBy: req.user.id });
-  if (exists) {
-    return res.status(409).json({ message: "Project already exists" });
-  }
-
-  const project = await Project.create({
-    name,
-    description,
-    createdBy: req.user.id,
-  });
-
-  await logAudit({
-    user: req.user,
-    action: "PROJECT_CREATE",
-    ipAddress: req.ip,
-  });
-
-  res.status(201).json({
-    message: "Project created",
-    project,
-  });
 };
 
 /**
  * Get all projects
  */
 exports.listProjects = async (req, res) => {
-  // Only return projects created by the current user
-  const projects = await Project.find(
-    { isActive: true, createdBy: req.user.id },
-    { name: 1, description: 1, createdAt: 1, updatedAt: 1, _id: 1 }
-  ).sort({ createdAt: -1 });
+  try {
+    // Only return projects created by the current user
+    const projects = await Project.find(
+      { isActive: true, createdBy: req.user.id },
+      { name: 1, description: 1, createdAt: 1, updatedAt: 1, _id: 1 }
+    ).sort({ createdAt: -1 });
 
-  res.json({
-    count: projects.length,
-    projects,
-  });
+    res.json({
+      count: projects.length,
+      projects,
+    });
+  } catch (error) {
+    console.error("Error listing projects:", error);
+    res.status(500).json({ message: "Error fetching projects", error: error.message });
+  }
 };
 
 /**
