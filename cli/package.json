@@ -1,0 +1,13 @@
+{
+  "name": "envsync",
+  "version": "1.0.0",
+  "bin": {
+    "envsync": "bin/envsync.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.0.0",
+    "dotenv": "^16.6.1"
+  }
+}
