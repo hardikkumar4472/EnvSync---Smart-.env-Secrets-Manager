@@ -3,6 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Shield, AlertCircle, Moon, Sun } from 'lucide-react';
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://envsync-backend.onrender.com';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -32,13 +35,13 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://envsync-backend.onrender.com/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, role }),
-      });
+     const response = await fetch(`${API_URL}/register`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ email, password, role }),
+});
 
       const data = await response.json();
 
