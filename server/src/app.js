@@ -10,7 +10,8 @@ app.use(cors({
     'http://localhost:5173', 
     'http://localhost:3000',
     'https://envsync.onrender.com',
-    'https://envsync-dp6u.onrender.com' // Your deployed frontend
+    'https://envsync-dp6u.onrender.com',
+    'https://envsync-sockets.onrender.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
