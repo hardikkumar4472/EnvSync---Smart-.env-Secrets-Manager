@@ -7,7 +7,12 @@ import {
   CheckCircle,
   AlertCircle,
   Info,
+  Zap,
+  Shield,
+  Code,
+  ArrowRight
 } from 'lucide-react';
+import PageTransition from '../components/PageTransition';
 
 const CLICommands = () => {
   const [expandedCommand, setExpandedCommand] = useState(null);
@@ -233,438 +238,274 @@ Password: ******
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>
-          CLI Commands Reference
-        </h1>
-        <p style={{color: 'var(--color-text-light)'}}>
-          Complete guide to all EnvSync CLI commands with examples and usage
-        </p>
-      </div>
-
-      {/* Commands List */}
-      <div className="space-y-4">
-        {commands.map((command) => {
-          const isExpanded = expandedCommand === command.id;
-          return (
-            <div
-              key={command.id}
-              className="rounded-xl shadow-md border overflow-hidden"
-              style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}
-            >
-              {/* Command Header */}
-              <button
-                onClick={() =>
-                  setExpandedCommand(isExpanded ? null : command.id)
-                }
-                className="w-full flex items-center justify-between p-6 transition-colors text-left"
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8F9FA'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{backgroundColor: 'rgba(59, 151, 151, 0.1)'}}>
-                    <Terminal className="w-5 h-5" style={{color: '#3B9797'}} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold font-mono" style={{color: 'var(--color-text-primary)'}}>
-                      {command.name}
-                    </h3>
-                    <p className="text-sm mt-1" style={{color: 'var(--color-text-secondary)'}}>
-                      {command.description}
-                    </p>
-                  </div>
-                </div>
-                {isExpanded ? (
-                  <ChevronDown className="w-5 h-5" style={{color: 'var(--color-text-light)'}} />
-                ) : (
-                  <ChevronRight className="w-5 h-5" style={{color: 'var(--color-text-light)'}} />
-                )}
-              </button>
-
-              {/* Expanded Content */}
-              {isExpanded && (
-                <div className="p-6 space-y-6" style={{borderTop: '1px solid #E2E8F0'}}>
-                  {/* Syntax */}
-                  <div>
-                    <h4 className="text-sm font-semibold mb-2 flex items-center" style={{color: 'var(--color-text-primary)'}}>
-                      <Info className="w-4 h-4 mr-2" />
-                      Syntax
-                    </h4>
-                    <div className="p-4 rounded-lg font-mono text-sm overflow-x-auto" style={{backgroundColor: '#132440', color: '#3B9797'}}>
-                      <div className="flex items-center justify-between">
-                        <code>{command.syntax}</code>
-                        <button
-                          onClick={() =>
-                            copyToClipboard(command.syntax, `syntax-${command.id}`)
-                          }
-                          className="ml-4 transition-colors"
-                          style={{color: 'var(--color-text-light)'}}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#718096'}
-                        >
-                          {copiedText === `syntax-${command.id}` ? (
-                            <CheckCircle className="w-4 h-4" />
-                          ) : (
-                            <Copy className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Options */}
-                  {command.options && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                        Options
-                      </h4>
-                      <p className="text-sm text-gray-700">{command.options}</p>
-                    </div>
-                  )}
-
-                  {/* Required Options */}
-                  {command.requiredOptions && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                        Required Options
-                      </h4>
-                      <div className="space-y-3">
-                        {command.requiredOptions.map((option, idx) => (
-                          <div
-                            key={idx}
-                            className="rounded-lg p-4 border"
-                            style={{backgroundColor: 'var(--color-bg-light)', borderColor: 'var(--color-text-light)'}}
-                          >
-                            <code className="text-sm font-mono font-semibold" style={{color: '#3B9797'}}>
-                              {option.name}
-                            </code>
-                            <p className="text-sm text-gray-700 mt-1">
-                              {option.description}
-                            </p>
-                            {option.format && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                Format: {option.format}
-                              </p>
-                            )}
-                            {option.validValues && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                Valid values:{' '}
-                                {option.validValues.map((v) => (
-                                  <code
-                                    key={v}
-                                    className="bg-white px-1 py-0.5 rounded"
-                                  >
-                                    {v}
-                                  </code>
-                                ))}
-                              </p>
-                            )}
-                            {option.example && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                Example: <code>{option.example}</code>
-                              </p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Prompts */}
-                  {command.prompts && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                        Interactive Prompts
-                      </h4>
-                      <div className="space-y-2">
-                        {command.prompts.map((prompt, idx) => (
-                          <div key={idx} className="flex items-start space-x-2">
-                            <span className="text-sm font-medium text-gray-700">
-                              {idx + 1}. {prompt.label}:
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {prompt.description}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Examples */}
-                  {command.examples && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                        Examples
-                      </h4>
-                      <div className="space-y-4">
-                        {command.examples.map((example, idx) => (
-                          <div key={idx}>
-                            {example.description && (
-                              <p className="text-sm font-medium text-gray-700 mb-2">
-                                {example.description}
-                              </p>
-                            )}
-                            <div className="p-4 rounded-lg font-mono text-sm overflow-x-auto" style={{backgroundColor: '#132440', color: '#3B9797'}}>
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-gray-400">$</span>
-                                <button
-                                  onClick={() =>
-                                    copyToClipboard(
-                                      example.command,
-                                      `example-${command.id}-${idx}`
-                                    )
-                                  }
-                                  className="transition-colors"
-                                  style={{color: 'var(--color-text-light)'}}
-                                  onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
-                                  onMouseLeave={(e) => e.currentTarget.style.color = '#718096'}
-                                >
-                                  {copiedText ===
-                                  `example-${command.id}-${idx}` ? (
-                                    <CheckCircle className="w-4 h-4" />
-                                  ) : (
-                                    <Copy className="w-4 h-4" />
-                                  )}
-                                </button>
-                              </div>
-                              <code>{example.command}</code>
-                            </div>
-                            {example.output && (
-                              <div className="mt-2 border rounded-lg p-4 font-mono text-sm whitespace-pre-wrap" style={{backgroundColor: '#F8F9FA', borderColor: '#E2E8F0', color: '#4A5568'}}>
-                                {example.output}
-                              </div>
-                            )}
-                            {example.interaction && (
-                              <div className="mt-2 border rounded-lg p-4 font-mono text-sm whitespace-pre-wrap" style={{backgroundColor: '#F8F9FA', borderColor: '#E2E8F0', color: '#4A5568'}}>
-                                {example.interaction}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Output */}
-                  {command.output && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                        Expected Output
-                      </h4>
-                      <div className="border rounded-lg p-4 font-mono text-sm whitespace-pre-wrap" style={{backgroundColor: '#F8F9FA', borderColor: '#E2E8F0', color: '#4A5568'}}>
-                        {command.output}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Use Cases */}
-                  {command.useCases && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                        Use Cases
-                      </h4>
-                      <ul className="space-y-2">
-                        {command.useCases.map((useCase, idx) => (
-                          <li key={idx} className="flex items-start space-x-2">
-                            <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{color: '#3B9797'}} />
-                            <span className="text-sm text-gray-700">
-                              {useCase}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Roles */}
-                  {command.roles && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                        User Roles
-                      </h4>
-                      <div className="space-y-2">
-                        {command.roles.map((role, idx) => (
-                          <div
-                            key={idx}
-                            className="rounded-lg p-3 border"
-                            style={{backgroundColor: 'var(--color-bg-light)', borderColor: 'var(--color-text-light)'}}
-                          >
-                            <span className="text-sm font-semibold text-gray-900 capitalize">
-                              {role.role}
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {' '}
-                              - {role.description}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Security Features */}
-                  {command.securityFeatures && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-2 text-green-600" />
-                        Security Features
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {command.securityFeatures.map((feature, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center space-x-2 rounded-lg p-2 border"
-                            style={{backgroundColor: 'rgba(59, 151, 151, 0.1)', borderColor: '#3B9797'}}
-                          >
-                            <CheckCircle className="w-4 h-4 flex-shrink-0" style={{color: '#3B9797'}} />
-                            <span className="text-sm text-gray-700">
-                              {feature}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Access Control */}
-                  {command.accessControl && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                        Access Control
-                      </h4>
-                      <div className="rounded-lg border overflow-hidden" style={{backgroundColor: 'var(--color-bg-light)', borderColor: 'var(--color-text-light)'}}>
-                        <table className="w-full">
-                          <thead className="bg-gray-100">
-                            <tr>
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-700">
-                                User Role
-                              </th>
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-700">
-                                Can Use
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {command.accessControl.map((item, idx) => (
-                              <tr key={idx} className="border-t border-gray-200">
-                                <td className="px-4 py-2 text-sm text-gray-900">
-                                  {item.role}
-                                </td>
-                                <td className="px-4 py-2">
-                                  {item.canUse ? (
-                                    <span className="text-green-600 font-medium">
-                                      ✓ Yes
-                                    </span>
-                                  ) : (
-                                    <span className="text-red-600 font-medium">
-                                      ✗ No
-                                    </span>
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Important Notes */}
-                  {command.importantNotes && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-2 text-yellow-600" />
-                        Important Notes
-                      </h4>
-                      <div className="space-y-2">
-                        {command.importantNotes.map((note, idx) => (
-                          <div
-                            key={idx}
-                            className="border rounded-lg p-3"
-                            style={{backgroundColor: 'rgba(191, 9, 47, 0.05)', borderColor: '#BF092F'}}
-                          >
-                            <p className="text-sm" style={{color: '#BF092F'}}>
-                              ⚠️ {note}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Notes */}
-                  {command.notes && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                        Notes
-                      </h4>
-                      <ul className="space-y-2">
-                        {command.notes.map((note, idx) => (
-                          <li key={idx} className="flex items-start space-x-2">
-                            <span className="text-gray-400">•</span>
-                            <span className="text-sm text-gray-700">{note}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
+    <PageTransition>
+      <div className="space-y-10 pb-20">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,1)]" />
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40">Secure Shell / Interface</span>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Quick Reference */}
-      <div className="rounded-xl p-6 border-2" style={{background: 'linear-gradient(135deg, rgba(59, 151, 151, 0.05) 0%, rgba(59, 151, 151, 0.1) 100%)', borderColor: '#3B9797'}}>
-        <h2 className="text-xl font-semibold mb-4" style={{color: 'var(--color-text-primary)'}}>
-          Quick Reference
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="rounded-lg p-4" style={{backgroundColor: 'var(--color-bg-card)'}}>
-            <h3 className="font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>
-              Most Common Commands
-            </h3>
-            <div className="space-y-2 font-mono text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Login</span>
-                <code style={{color: '#3B9797'}}>envsync login</code>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Check status</span>
-                <code style={{color: '#3B9797'}}>envsync whoami</code>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Run app</span>
-                <code className="text-blue-600">
-                  envsync run --project ID --env dev npm start
-                </code>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Logout</span>
-                <code style={{color: '#3B9797'}}>envsync logout</code>
-              </div>
-            </div>
+            <h1 className="text-4xl font-black text-white tracking-tighter">CLI Protocols</h1>
           </div>
-          <div className="rounded-lg p-4" style={{backgroundColor: 'var(--color-bg-card)'}}>
-            <h3 className="font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>
-              Typical Workflow
-            </h3>
-            <ol className="space-y-2 text-sm text-gray-700 list-decimal list-inside">
-              <li>First time setup: <code style={{color: '#3B9797'}}>envsync login</code></li>
-              <li>Verify login: <code style={{color: '#3B9797'}}>envsync whoami</code></li>
-              <li>Use secrets: <code style={{color: '#3B9797'}}>envsync run --project ID --env dev npm start</code></li>
-              <li>When done: <code style={{color: '#3B9797'}}>envsync logout</code></li>
-            </ol>
+          <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+            <Code className="w-4 h-4 text-purple-400" />
+            <span className="text-[10px] uppercase font-black tracking-widest text-white/60 font-mono">ENVSYNC_V1.0.0</span>
+          </div>
+        </div>
+
+        {/* Commands List */}
+        <div className="space-y-4">
+          {commands.map((command) => {
+            const isExpanded = expandedCommand === command.id;
+            return (
+              <div
+                key={command.id}
+                className={`hero-glass-card overflow-hidden transition-all duration-300 ${isExpanded ? 'ring-1 ring-purple-500/30' : ''}`}
+              >
+                {/* Command Header */}
+                <button
+                  onClick={() => setExpandedCommand(isExpanded ? null : command.id)}
+                  className={`w-full flex items-center justify-between p-6 text-left transition-all ${isExpanded ? 'bg-white/5' : 'hover:bg-white/5'}`}
+                >
+                  <div className="flex items-center space-x-5">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${isExpanded ? 'bg-purple-500/20 border-purple-500/30 shadow-lg shadow-purple-500/20' : 'bg-white/5 border-white/10 group-hover:bg-white/10'}`}>
+                      <Terminal className={`w-6 h-6 ${isExpanded ? 'text-purple-400' : 'text-white/40'}`} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black text-white tracking-tight font-mono">
+                        {command.name}
+                      </h3>
+                      <p className="text-xs font-medium text-white/40 mt-1 uppercase tracking-wider">
+                        {command.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-white/10 text-white' : 'text-white/30'}`}>
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </button>
+
+                {/* Expanded Content */}
+                {isExpanded && (
+                  <div className="p-8 space-y-10 border-t border-white/5 bg-black/20">
+                    {/* Syntax Block */}
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <Info className="w-4 h-4 text-cyan-400" />
+                        <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60">Operation Syntax</h4>
+                      </div>
+                      <div className="p-6 rounded-2xl bg-black/60 border border-white/10 font-mono text-sm relative group">
+                        <div className="flex items-center justify-between">
+                          <code className="text-cyan-400 font-bold whitespace-nowrap overflow-x-auto custom-scrollbar pr-10">{command.syntax}</code>
+                          <button
+                            onClick={() => copyToClipboard(command.syntax, `syntax-${command.id}`)}
+                            className="absolute right-6 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-white/40 hover:text-white border border-white/5"
+                          >
+                            {copiedText === `syntax-${command.id}` ? (
+                              <CheckCircle className="w-4 h-4 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content Section Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                      {/* Left Column: Requirements & Prompts */}
+                      <div className="space-y-8">
+                        {command.requiredOptions && (
+                          <div className="space-y-4">
+                            <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60 flex items-center space-x-2">
+                              <Zap className="w-4 h-4 text-purple-400" />
+                              <span>Required Modifiers</span>
+                            </h4>
+                            <div className="space-y-3">
+                              {command.requiredOptions.map((option, idx) => (
+                                <div
+                                  key={idx}
+                                  className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2 hover:border-purple-500/20 transition-all"
+                                >
+                                  <code className="text-xs font-bold text-purple-400">
+                                    {option.name}
+                                  </code>
+                                  <p className="text-xs font-medium text-white/60">
+                                    {option.description}
+                                  </p>
+                                  {option.format && (
+                                    <p className="text-[10px] font-mono text-white/20 uppercase tracking-widest pt-2">
+                                      Format: {option.format}
+                                    </p>
+                                  )}
+                                  {option.validValues && (
+                                    <div className="flex items-center space-x-2 pt-1">
+                                      {option.validValues.map((v) => (
+                                        <code key={v} className="px-2 py-0.5 rounded bg-white/5 text-[10px] font-mono text-cyan-400/70 border border-white/5">
+                                          {v}
+                                        </code>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {command.prompts && (
+                          <div className="space-y-4">
+                            <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60">Interactive Queries</h4>
+                            <div className="space-y-2">
+                              {command.prompts.map((prompt, idx) => (
+                                <div key={idx} className="flex items-center space-x-3 p-3 rounded-lg bg-white/5 border border-white/5">
+                                  <span className="text-[10px] font-black text-cyan-500">{idx + 1}</span>
+                                  <span className="text-xs font-bold text-white/80">{prompt.label}:</span>
+                                  <span className="text-xs text-white/40">{prompt.description}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {command.useCases && (
+                          <div className="space-y-4">
+                            <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60">Operational Context</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {command.useCases.map((useCase, idx) => (
+                                <span key={idx} className="px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-[10px] font-black text-emerald-400/80 uppercase tracking-widest flex items-center space-x-2">
+                                  <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span>{useCase}</span>
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right Column: Examples & Output */}
+                      <div className="space-y-8">
+                        {command.examples && (
+                          <div className="space-y-4">
+                            <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60">Execution Examples</h4>
+                            <div className="space-y-6">
+                              {command.examples.map((example, idx) => (
+                                <div key={idx} className="space-y-3">
+                                  {example.description && (
+                                    <p className="text-xs font-black text-white/70 flex items-center space-x-2 italic">
+                                      <ChevronRight className="w-3 h-3 text-purple-500" />
+                                      <span>{example.description}</span>
+                                    </p>
+                                  )}
+                                  <div className="p-5 rounded-2xl bg-white/5 border border-white/5 font-mono text-xs relative group/ex overflow-hidden">
+                                     <div className="absolute top-0 left-0 w-1 h-full bg-purple-500/40" />
+                                    <div className="flex items-center justify-between mb-3 text-white/20">
+                                      <span className="font-bold tracking-widest text-[10px]">TERMINAL_STDOUT</span>
+                                      <button
+                                        onClick={() => copyToClipboard(example.command, `example-${command.id}-${idx}`)}
+                                        className="p-1.5 rounded bg-white/5 hover:bg-white/10 text-white/40 hover:text-white"
+                                      >
+                                        <Copy className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                    <code className="text-white font-medium block pr-4">
+                                      <span className="text-purple-500 mr-2">$</span>
+                                      {example.command}
+                                    </code>
+                                    {example.output && (
+                                      <div className="mt-4 p-4 rounded-xl bg-black/40 text-emerald-400/80 leading-relaxed border border-white/5 italic">
+                                        {example.output}
+                                      </div>
+                                    )}
+                                    {example.interaction && (
+                                      <div className="mt-4 p-4 rounded-xl bg-black/40 text-cyan-400/80 leading-relaxed border border-white/5">
+                                        {example.interaction}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {command.securityFeatures && (
+                          <div className="space-y-4">
+                            <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60 flex items-center space-x-2">
+                              <Shield className="w-4 h-4 text-emerald-400" />
+                              <span>Hardened Layer</span>
+                            </h4>
+                            <ul className="grid grid-cols-1 gap-2">
+                              {command.securityFeatures.map((feature, idx) => (
+                                <li key={idx} className="flex items-center space-x-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                  <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                                  <span className="text-[11px] font-bold text-white/70">{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Important Warnings */}
+                    {command.importantNotes && (
+                      <div className="p-6 rounded-2xl bg-red-500/5 border border-red-500/10 space-y-4">
+                        <h4 className="text-[10px] uppercase font-black tracking-[0.2em] text-red-500 flex items-center space-x-2">
+                          <AlertCircle className="w-4 h-4" />
+                          <span>Critical Directives</span>
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {command.importantNotes.map((note, idx) => (
+                            <div key={idx} className="flex items-start space-x-3">
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1 flex-shrink-0" />
+                              <p className="text-xs font-bold text-white/50 leading-relaxed">{note}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Workflow Guide */}
+        <div className="hero-glass-card p-10 border-l-8 border-cyan-500/50 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Zap className="w-40 h-40 text-cyan-500" />
+          </div>
+          
+          <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-8 flex items-center space-x-3">
+            <Zap className="w-6 h-6 text-cyan-400" />
+            <span>Operational Workflow</span>
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
+            {[
+              { s: 'Authentication', d: 'envsync login', i: '01' },
+              { s: 'Identification', d: 'envsync whoami', i: '02' },
+              { s: 'Vault Extraction', d: 'envsync run ...', i: '03' },
+              { s: 'Session Termination', d: 'envsync logout', i: '04' }
+            ].map((step, i) => (
+              <div key={i} className="space-y-3">
+                <div className="text-[10px] font-black text-cyan-500/50 uppercase tracking-[0.5em]">{step.i}</div>
+                <h4 className="text-white font-bold">{step.s}</h4>
+                <div className="p-3 rounded-lg bg-black/40 border border-white/5">
+                  <code className="text-[11px] font-mono text-cyan-400">{step.d}</code>
+                </div>
+                {i < 3 && <ArrowRight className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 text-white/10" />}
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 
 export default CLICommands;
-

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Shield, AlertCircle, Moon, Sun } from 'lucide-react';
+import { Shield, AlertCircle, Moon, Sun, ArrowLeft } from 'lucide-react';
 
 const Login = () => {
   const { login } = useAuth();
@@ -11,6 +11,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,101 +22,94 @@ const Login = () => {
     const result = await login(email, password);
     setLoading(false);
 
-    if (!result.success) {
+    if (result.success) {
+      setAccessGranted(true);
+    } else {
+      setAccessDenied(true);
       setError(result.message);
+      setTimeout(() => setAccessDenied(false), 2000);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{background: 'linear-gradient(135deg, var(--color-dark) 0%, var(--color-secondary) 100%)'}}>
-      {/* Dark Mode Toggle - Floating */}
-      <button
-        onClick={toggleDarkMode}
-        className="fixed top-6 right-6 p-3 rounded-lg transition-all shadow-lg z-50"
-        style={{
-          backgroundColor: isDarkMode ? 'rgba(77, 179, 179, 0.2)' : 'rgba(255, 255, 255, 0.2)',
-          color: isDarkMode ? '#4DB3B3' : '#FFFFFF',
-          backdropFilter: 'blur(10px)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-        title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      >
-        {isDarkMode ? (
-          <Sun className="w-6 h-6" />
-        ) : (
-          <Moon className="w-6 h-6" />
-        )}
-      </button>
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background & Effects */}
+      <div className="homepage-bg" />
+      <div className="scanline" />
+      <div className="fixed inset-0 pointer-events-none z-[-1] bg-black/10 dark:bg-black/40" />
 
-      <div className="max-w-md w-full">
-        <div className="rounded-2xl shadow-2xl p-8" style={{backgroundColor: 'var(--color-bg-card)'}}>
+      {/* Access Status Overlays */}
+      {accessGranted && (
+        <div className="access-status access-granted">
+          ACCESS GRANTED
+        </div>
+      )}
+      {accessDenied && (
+        <div className="access-status access-denied">
+          ACCESS DENIED
+        </div>
+      )}
+
+      {/* Header-like Nav */}
+      <div className="fixed top-0 left-0 w-full p-6 flex items-center justify-between z-50">
+        <Link to="/" className="flex items-center space-x-3 group">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 group-hover:bg-white/20 transition-all">
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">Back to Home</span>
+        </Link>
+        <button
+          onClick={toggleDarkMode}
+          className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all"
+        >
+          {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+        </button>
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
+        <div className="hero-glass-card p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 gradient-primary shadow-lg">
-              <Shield className="w-8 h-8 text-white" />
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 bg-white/5 backdrop-blur-md border border-white/20 shadow-xl overflow-hidden p-3 relative">
+              <img 
+                src="/logo.svg" 
+                alt="EnvSync Logo" 
+                className="w-full h-full object-contain relative z-10"
+              />
             </div>
-            <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>EnvSync</h1>
-            <p style={{color: 'var(--color-text-light)'}}>Secure Secret Management System</p>
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2 tracking-tighter">System Login</h1>
+            <p className="text-white/50 font-medium">Verify your security credentials</p>
           </div>
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="border rounded-lg p-4 flex items-start space-x-3" style={{backgroundColor: 'rgba(191, 9, 47, 0.1)', borderColor: '#BF092F'}}>
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#BF092F'}} />
-                <p className="text-sm" style={{color: '#BF092F'}}>{error}</p>
+              <div className="border border-red-500/50 rounded-xl p-4 flex items-start space-x-3 bg-red-500/10 backdrop-blur-md">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-200 font-medium">{error}</p>
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium mb-2"
-                style={{color: 'var(--color-text-primary)'}}
-              >
-                Email Address
-              </label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-white/70 uppercase tracking-widest ml-1">Identifier</label>
               <input
-                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-lg border transition-colors"
-                style={{
-                  backgroundColor: 'var(--color-bg-light)',
-                  borderColor: 'var(--color-text-light)',
-                  color: 'var(--color-text-primary)'
-                }}
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-cyan-500/50 focus:bg-white/10 transition-all outline-none placeholder:text-white/20"
                 placeholder="admin@envsync.com"
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium mb-2"
-                style={{color: 'var(--color-text-primary)'}}
-              >
-                Password
-              </label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-white/70 uppercase tracking-widest ml-1">Security Key</label>
               <input
-                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-lg border transition-colors"
-                style={{
-                  backgroundColor: 'var(--color-bg-light)',
-                  borderColor: 'var(--color-text-light)',
-                  color: 'var(--color-text-primary)'
-                }}
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-cyan-500/50 focus:bg-white/10 transition-all outline-none placeholder:text-white/20"
                 placeholder="••••••••"
               />
             </div>
@@ -122,26 +117,24 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg font-medium text-white transition-all gradient-primary"
-              style={{
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer'
-              }}
+              className="btn-purple w-full py-5 text-lg"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Verifying...</span>
+                </div>
+              ) : 'Authenticate'}
             </button>
 
-            <div className="text-center">
-              <p style={{color: 'var(--color-text-light)'}}>
-                Don't have an account?{' '}
+            <div className="text-center pt-4">
+              <p className="text-white/40 font-medium">
+                New security entity?{' '}
                 <Link 
                   to="/register" 
-                  className="font-medium transition-colors"
-                  style={{color: '#3B9797'}}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#4DB3B3'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#3B9797'}
+                  className="text-cyan-400 hover:text-cyan-300 font-bold underline underline-offset-4"
                 >
-                  Create Account
+                  Create Identity
                 </Link>
               </p>
             </div>

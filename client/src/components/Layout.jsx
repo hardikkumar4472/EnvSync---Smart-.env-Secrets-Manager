@@ -14,6 +14,8 @@ import {
   Shield,
   Moon,
   Sun,
+  User as UserIcon,
+  ChevronDown
 } from 'lucide-react';
 
 const Layout = () => {
@@ -21,10 +23,12 @@ const Layout = () => {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
+    setProfileDropdownOpen(false);
     navigate('/login');
   };
 
@@ -33,173 +37,205 @@ const Layout = () => {
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
     { path: '/app/secrets', icon: Key, label: 'Secrets' },
     { path: '/app/audit-logs', icon: FileText, label: 'Audit Logs' },
-    { path: '/app/cli-commands', icon: Terminal, label: 'CLI Commands' },
+    { path: '/app/cli-commands', icon: Terminal, label: 'CLI' },
   ];
 
   return (
-    <div className="h-screen overflow-hidden" style={{backgroundColor: 'var(--color-bg-light)'}}>
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 lg:hidden"
-          style={{backgroundColor: 'rgba(19, 36, 64, 0.5)'}}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Background & Scanners */}
+      <div className="homepage-bg z-0" />
+      <div className="scanline z-[2]" />
+      <div className="fixed inset-0 pointer-events-none z-[1] bg-black/40 backdrop-blur-[2px]" />
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-        style={{backgroundColor: 'var(--color-dark)'}}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b" style={{borderColor: 'var(--color-dark-light)'}}>
+      {/* Top Navigation Bar */}
+      <header className="fixed top-0 left-0 w-full z-[100] glass-header bg-black/40 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            {/* Logo Section */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center gradient-primary">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">EnvSync</h1>
-                <p className="text-xs" style={{color: '#A0AEC0'}}>Admin Dashboard</p>
-              </div>
+              <Link to="/app/dashboard" className="flex items-center space-x-2.5 group">
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 shadow-lg group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all overflow-hidden p-1.5 relative">
+                  <img 
+                    src="/logo.svg" 
+                    alt="EnvSync Logo" 
+                    className="w-full h-full object-contain relative z-10"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl font-black text-white tracking-tighter leading-none">EnvSync</h1>
+                  <span className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-black">Industrial Protocol</span>
+                </div>
+              </Link>
             </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden transition-colors"
-              style={{color: '#A0AEC0'}}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#A0AEC0'}
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
 
-          {/* User Info */}
-          <div className="p-4 border-b" style={{borderColor: 'var(--color-dark-light)'}}>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center gradient-accent">
-                <span className="text-white font-semibold">
-                  {user?.email?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user?.email}</p>
-                <p className="text-xs capitalize" style={{color: '#A0AEC0'}}>{user?.role}</p>
-              </div>
-            </div>
-          </div>
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-2.5 px-4 py-2.5 rounded-xl transition-all group border ${
+                      isActive 
+                        ? 'bg-white/10 text-white border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.05)]' 
+                        : 'text-white/40 border-transparent hover:text-white hover:bg-white/5 hover:border-white/10'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-cyan-400' : 'group-hover:text-cyan-400'}`} />
+                    <span className="text-[11px] font-black tracking-widest uppercase">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
 
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setSidebarOpen(false)}
-                  className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all"
-                  style={{
-                    backgroundColor: isActive ? 'rgba(59, 151, 151, 0.2)' : 'transparent',
-                    color: isActive ? '#3B9797' : '#A0AEC0',
-                    fontWeight: isActive ? '500' : '400'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-                      e.currentTarget.style.color = '#FFFFFF';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#A0AEC0';
-                    }
-                  }}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Logout Button */}
-          <div className="p-4 border-t" style={{borderColor: 'var(--color-dark-light)'}}>
-            <button
-              onClick={handleLogout}
-              className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg transition-all"
-              style={{color: '#BF092F'}}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(191, 9, 47, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="lg:pl-64 h-full flex flex-col">
-        {/* Top Bar */}
-        <header className="shadow-sm border-b sticky top-0 z-30" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-          <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden transition-colors"
-              style={{color: 'var(--color-text-light)'}}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-text-primary)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-light)'}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            <div className="flex-1" />
-            <div className="flex items-center space-x-4">
-              {/* Dark Mode Toggle */}
+            {/* Right Side Actions */}
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={toggleDarkMode}
-                className="p-2 rounded-lg transition-all"
-                style={{
-                  backgroundColor: isDarkMode ? 'rgba(77, 179, 179, 0.1)' : 'rgba(22, 71, 106, 0.1)',
-                  color: isDarkMode ? '#4DB3B3' : '#16476A'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                className="p-2 sm:p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all hover:bg-white/10"
               >
-                {isDarkMode ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
+                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
 
-              <div className="hidden md:flex items-center space-x-2 text-sm" style={{color: 'var(--color-secondary)'}}>
-                <Shield className="w-4 h-4" />
-                <span className="capitalize font-medium">{user?.role}</span>
+              {/* User Dropdown Container */}
+              <div className="relative">
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className={`flex items-center space-x-2 sm:space-x-3 p-1 sm:p-1.5 pr-1.5 sm:pr-4 rounded-xl border transition-all ${
+                    profileDropdownOpen 
+                    ? 'bg-white/15 border-purple-500/50 shadow-lg shadow-purple-500/10' 
+                    : 'bg-white/5 border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center">
+                    <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <p className="text-[11px] font-black text-white leading-none truncate max-w-[120px]">{user?.email?.split('@')[0]}</p>
+                    <div className="flex items-center space-x-1 mt-0.5">
+                       <div className="w-1 h-1 rounded-full bg-cyan-500" />
+                       <p className="text-[8px] uppercase font-black text-white/30 tracking-[0.1em]">{user?.role}</p>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-3 h-3 text-white/30 transition-transform duration-300 ${profileDropdownOpen ? 'rotate-180 text-white' : ''}`} />
+                </button>
+
+                {/* Dropdown Card */}
+                {profileDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
+                    <div className="absolute right-0 mt-3 w-64 bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                       <div className="px-5 py-4 border-b border-white/5 bg-white/5">
+                          <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-1.5">Authorized Entity</p>
+                          <p className="text-xs font-bold text-white truncate">{user?.email}</p>
+                       </div>
+                       <div className="p-2 space-y-1">
+                          <button
+                            onClick={() => { navigate('/app/dashboard'); setProfileDropdownOpen(false); }}
+                            className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl transition-all text-white/60 hover:text-white hover:bg-white/5 font-bold text-xs"
+                          >
+                            <LayoutDashboard className="w-4 h-4" />
+                            <span>System Dashboard</span>
+                          </button>
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl transition-all text-red-400 hover:text-red-300 hover:bg-red-500/10 font-bold text-xs"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <span>Terminate Protocol</span>
+                          </button>
+                       </div>
+                    </div>
+                  </>
+                )}
               </div>
+
+              {/* Mobile Menu Icon */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 sm:p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+              </button>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Page Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6" style={{backgroundColor: 'var(--color-bg-light)'}}>
-          <Outlet />
-        </main>
-      </div>
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <>
+            <div 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] md:hidden" 
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            
+            <div className="md:hidden fixed top-16 sm:top-20 left-0 w-full bg-[#0A0A0A] border-t border-white/10 shadow-2xl z-[200] animate-in slide-in-from-top duration-300">
+              <div className="p-4 space-y-2 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                <div className="px-5 py-2 mb-2">
+                  <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Protocol Navigation</p>
+                </div>
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center space-x-4 px-5 py-4 rounded-xl transition-all border ${
+                        isActive 
+                          ? 'bg-purple-500/20 text-white border-purple-500/40 shadow-lg shadow-purple-500/10' 
+                          : 'text-white/40 border-transparent hover:bg-white/5'
+                      }`}
+                    >
+                      <Icon className={`w-5 h-5 ${isActive ? 'text-cyan-400' : ''}`} />
+                      <span className={`text-sm font-black uppercase tracking-widest ${isActive ? 'text-white' : ''}`}>{item.label}</span>
+                    </Link>
+                  );
+                })}
+                
+                <div className="pt-4 mt-4 border-t border-white/5 space-y-2">
+                   <button
+                    onClick={() => { setMobileMenuOpen(false); toggleDarkMode(); }}
+                    className="flex items-center space-x-4 w-full px-5 py-4 rounded-xl text-white/40 hover:bg-white/5 transition-all text-sm font-black uppercase tracking-widest"
+                  >
+                    {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+                    <span>{isDarkMode ? 'Atmospheric Mode' : 'Low Light Mode'}</span>
+                  </button>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
+                    className="flex items-center space-x-4 w-full px-5 py-4 rounded-xl text-red-500/60 hover:bg-red-500/10 transition-all text-sm font-black uppercase tracking-widest"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>Terminate Session</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 relative z-10 pt-24 sm:pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full overflow-y-auto custom-scrollbar">
+        <Outlet />
+      </main>
+
+      {/* Industrial Status Footer */}
+      <footer className="fixed bottom-0 left-0 w-full p-6 pointer-events-none flex justify-between items-end z-40">
+        <div className="flex items-center space-x-3 px-5 py-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl">
+           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+           <span className="text-[9px] uppercase font-black tracking-[0.4em] text-white/60">System Link Active</span>
+        </div>
+        <div className="hidden md:flex items-center space-x-4 px-5 py-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl">
+           <div className="flex items-center space-x-2">
+              <Shield className="w-3 h-3 text-cyan-400" />
+              <span className="text-[9px] uppercase font-black tracking-[0.4em] text-white/40">AES_256_GCM</span>
+           </div>
+        </div>
+      </footer>
     </div>
   );
 };

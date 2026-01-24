@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { projectAPI, secretAPI } from '../services/api';
-import { Plus, Key, Eye, EyeOff, Copy, Search, Filter, Upload, CheckCircle, AlertCircle, FileUp, X, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Key, Eye, Copy, Search, Upload, CheckCircle, AlertCircle, FileUp, X, Edit2, Trash2, Database, Shield, ChevronRight, Terminal, Clock, Lock } from 'lucide-react';
+import PageTransition from '../components/PageTransition';
 
 const Secrets = () => {
   const [projects, setProjects] = useState([]);
@@ -29,7 +30,7 @@ const Secrets = () => {
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
   const [bulkSuccess, setBulkSuccess] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState('');
-  const [importMode, setImportMode] = useState('paste'); // 'paste' or 'upload'
+  const [importMode, setImportMode] = useState('paste');
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -97,9 +98,7 @@ const Secrets = () => {
       });
       fetchSecrets();
     } catch (error) {
-      setError(
-        error.response?.data?.message || 'Failed to create secret'
-      );
+      setError(error.response?.data?.message || 'Failed to create secret');
     } finally {
       setSubmitting(false);
     }
@@ -156,9 +155,7 @@ const Secrets = () => {
       });
       fetchSecrets();
     } catch (error) {
-      setError(
-        error.response?.data?.message || 'Failed to update secret'
-      );
+      setError(error.response?.data?.message || 'Failed to update secret');
     } finally {
       setSubmitting(false);
     }
@@ -174,972 +171,460 @@ const Secrets = () => {
       setSelectedSecret(null);
       fetchSecrets();
     } catch (error) {
-      setError(
-        error.response?.data?.message || 'Failed to delete secret'
-      );
+      setError(error.response?.data?.message || 'Failed to delete secret');
       setSubmitting(false);
     }
   };
 
-  // Parse .env content into key-value pairs
   const parseEnvContent = (content) => {
     const lines = content.split('\n');
     const secrets = [];
-    
     lines.forEach((line, index) => {
-      // Remove leading/trailing whitespace
       line = line.trim();
-      
-      // Skip empty lines and comments
-      if (!line || line.startsWith('#')) {
-        return;
-      }
-      
-      // Handle KEY=VALUE format
+      if (!line || line.startsWith('#')) return;
       const match = line.match(/^([^=#\s]+)\s*=\s*(.*)$/);
       if (match) {
         const key = match[1].trim();
         let value = match[2].trim();
-        
-        // Remove quotes if present
-        if ((value.startsWith('"') && value.endsWith('"')) || 
-            (value.startsWith("'") && value.endsWith("'"))) {
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
           value = value.slice(1, -1);
         }
-        
-        if (key) {
-          secrets.push({ key, value, lineNumber: index + 1 });
-        }
+        if (key) secrets.push({ key, value, lineNumber: index + 1 });
       }
     });
-    
     return secrets;
   };
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
-    // Check if it's a .env file
     if (!file.name.endsWith('.env') && !file.name.endsWith('.env.local') && !file.name.endsWith('.env.example')) {
-      setError('Please upload a .env file');
+      setError('Please upload a valid .env file');
       return;
     }
-
     setUploadedFileName(file.name);
     setError('');
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target.result;
       setBulkEnvContent(content);
       handleBulkParse(content);
     };
-    reader.onerror = () => {
-      setError('Failed to read file');
-    };
     reader.readAsText(file);
   };
 
   const handleBulkParse = (content = null) => {
     const contentToParse = content || bulkEnvContent;
-    
     if (!contentToParse.trim()) {
-      setError('Please paste .env content or upload a file');
+      setError('Please provide .env content');
       return;
     }
-    
     const parsed = parseEnvContent(contentToParse);
-    
     if (parsed.length === 0) {
-      setError('No valid key-value pairs found. Make sure your .env file uses KEY=VALUE format.');
+      setError('No valid key-value pairs detected');
       setParsedSecrets([]);
       return;
     }
-    
     setParsedSecrets(parsed);
     setError('');
   };
 
-  const handleRemoveFile = () => {
-    setUploadedFileName('');
-    setBulkEnvContent('');
-    setParsedSecrets([]);
-    setError('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
   const handleBulkSubmit = async () => {
-    if (!selectedProject || parsedSecrets.length === 0) {
-      setError('Please select a project and ensure secrets are parsed');
-      return;
-    }
-    
+    if (!selectedProject || parsedSecrets.length === 0) return;
     setBulkSubmitting(true);
-    setError('');
-    setBulkSuccess(false);
-    
-    const results = {
-      success: [],
-      failed: [],
-    };
-    
-    // Create secrets one by one
+    let successCount = 0;
     for (const secret of parsedSecrets) {
       try {
-        await secretAPI.create(
-          selectedProject,
-          selectedEnv,
-          secret.key,
-          secret.value
-        );
-        results.success.push(secret.key);
+        await secretAPI.create(selectedProject, selectedEnv, secret.key, secret.value);
+        successCount++;
       } catch (err) {
-        results.failed.push({
-          key: secret.key,
-          error: err.response?.data?.message || 'Failed to create secret',
-        });
+        console.error(`Failed: ${secret.key}`);
       }
     }
-    
     setBulkSubmitting(false);
-    
-    if (results.failed.length === 0) {
-      setBulkSuccess(true);
-      setBulkEnvContent('');
+    setBulkSuccess(true);
+    setTimeout(() => {
+      setShowBulkModal(false);
+      setBulkSuccess(false);
+      fetchSecrets();
       setParsedSecrets([]);
-      setTimeout(() => {
-        setShowBulkModal(false);
-        setBulkSuccess(false);
-        fetchSecrets();
-      }, 2000);
-    } else {
-      setError(
-        `Created ${results.success.length} secrets. Failed: ${results.failed.map(f => f.key).join(', ')}`
-      );
-    }
+      setBulkEnvContent('');
+    }, 1500);
   };
 
   const environments = ['dev', 'staging', 'prod'];
 
+  if (loading && projects.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <div className="w-16 h-16 rounded-full border-4 border-white/5 border-t-purple-500 animate-spin shadow-lg shadow-purple-500/20" />
+        <p className="text-purple-500 font-mono text-xs uppercase tracking-[0.3em] font-black animate-pulse">Accessing Vaults...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{color: '#132440'}}>Secrets</h1>
-          <p className="text-sm md:text-base style={{color: '#718096'}}">
-            Manage encrypted secrets for your projects
-          </p>
-        </div>
-        <div className="flex items-center space-x-3 w-full md:w-auto">
-          <button
-            onClick={() => {
-              setShowBulkModal(true);
-              setImportMode('upload');
-            }}
-            className="flex-1 md:flex-none flex items-center justify-center space-x-2 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg transition-all shadow-md text-sm md:text-base"
-            style={{backgroundColor: '#3B9797'}}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            <Upload className="w-4 h-4 md:w-5 md:h-5" />
-            <span>Upload</span>
-          </button>
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex-1 md:flex-none flex items-center justify-center space-x-2 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg transition-all shadow-md gradient-primary text-sm md:text-base"
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            <Plus className="w-4 h-4 md:w-5 md:h-5" />
-            <span>New Secret</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="rounded-xl shadow-md border p-4" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-              Project
-            </label>
-            <select
-              value={selectedProject}
-              onChange={(e) => {
-                setSelectedProject(e.target.value);
-                setFormData((prev) => ({ ...prev, projectId: e.target.value }));
-              }}
-              className="w-full px-4 py-2 border rounded-lg outline-none transition-all"
-              style={{borderColor: '#E2E8F0'}}
-              onFocus={(e) => e.target.style.borderColor = '#3B9797'}
-              onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-            >
-              <option value="">Select a project</option>
-              {projects.map((project) => (
-                <option key={project._id} value={project._id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
+    <PageTransition>
+      <div className="space-y-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-              Environment
-            </label>
-            <div className="flex space-x-2">
-              {environments.map((env) => (
-                <button
-                  key={env}
-                  onClick={() => {
-                    setSelectedEnv(env);
-                    setFormData((prev) => ({ ...prev, environment: env }));
-                  }}
-                  className="px-4 py-2 rounded-lg font-medium transition-all capitalize"
-                  style={{
-                    backgroundColor: selectedEnv === env ? '#3B9797' : 'var(--color-bg-light)',
-                    color: selectedEnv === env ? '#FFFFFF' : '#4A5568'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedEnv !== env) {
-                      e.currentTarget.style.backgroundColor = '#E2E8F0';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedEnv !== env) {
-                      e.currentTarget.style.backgroundColor = '#F8F9FA';
-                    }
-                  }}
-                >
-                  {env}
-                </button>
-              ))}
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,1)]" />
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40">Secrets / Repository</span>
             </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tighter">Identity Secrets</h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => { setShowBulkModal(true); setImportMode('upload'); }}
+              className="btn-glass px-4 sm:px-6 py-2.5 sm:py-3 text-cyan-400 flex items-center space-x-2 group"
+            >
+              <FileUp className="w-4 h-4" />
+              <span className="text-[10px] uppercase font-black tracking-widest">Bulk Import</span>
+            </button>
+            <button
+              onClick={() => setShowModal(true)}
+              className="btn-purple px-6 sm:px-8 py-2.5 sm:py-3 flex items-center space-x-2 shadow-lg shadow-purple-500/20"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="text-xs sm:text-base font-bold tracking-tight">New Secret</span>
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="border rounded-lg p-4" style={{backgroundColor: 'rgba(191, 9, 47, 0.1)', borderColor: '#BF092F'}}>
-          <p className="text-sm" style={{color: '#BF092F'}}>{error}</p>
-        </div>
-      )}
-
-      {/* Secrets List */}
-      {!selectedProject ? (
-        <div className="rounded-xl shadow-sm border p-12 text-center" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-          <Key className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold style={{color: 'var(--color-text-primary)'}} mb-2">
-            Select a project
-          </h3>
-          <p className="style={{color: 'var(--color-text-secondary)'}}">
-            Choose a project and environment to view secrets
-          </p>
-        </div>
-      ) : loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{borderColor: '#BF092F'}}></div>
-        </div>
-      ) : secrets.length === 0 ? (
-        <div className="rounded-xl shadow-sm border p-12 text-center" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-          <Key className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold style={{color: 'var(--color-text-primary)'}} mb-2">
-            No secrets found
-          </h3>
-          <p className="style={{color: 'var(--color-text-secondary)'}} mb-6">
-            Create your first secret for this project and environment
-          </p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="text-white px-6 py-3 rounded-lg transition-all gradient-primary"
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            Create Secret
-          </button>
-        </div>
-      ) : (
-        <div className="rounded-xl shadow-sm border overflow-hidden" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b" style={{backgroundColor: 'var(--color-bg-light)', borderColor: 'var(--color-text-light)'}}>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Key
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Environment
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-                {secrets.map((secret) => (
-                  <tr key={secret._id} className="transition-colors" style={{backgroundColor: 'var(--color-bg-card)'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-light)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-card)'}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <code className="text-sm font-mono style={{color: 'var(--color-text-primary)'}}">
-                        {secret.key}
-                      </code>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 text-xs font-medium rounded capitalize" style={{backgroundColor: 'rgba(59, 151, 151, 0.1)', color: '#3B9797'}}>
-                        {secret.environment}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(secret.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => handleViewValue(secret._id)}
-                          className="p-2 rounded-lg transition-colors"
-                          style={{color: '#3B9797'}}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 151, 151, 0.1)'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                          title="View secret value"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleEditSecret(secret)}
-                          className="p-2 rounded-lg transition-colors"
-                          style={{color: '#16476A'}}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(22, 71, 106, 0.1)'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                          title="Edit secret"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedSecret(secret);
-                            setShowDeleteModal(true);
-                          }}
-                          className="p-2 rounded-lg transition-colors"
-                          style={{color: '#BF092F'}}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(191, 9, 47, 0.1)'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                          title="Delete secret"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+        {/* Global Controls Filter */}
+        <div className="hero-glass-card p-6 border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1 flex items-center space-x-2">
+                <Database className="w-3 h-3" />
+                <span>Target Project Container</span>
+              </label>
+              <select
+                value={selectedProject}
+                onChange={(e) => setSelectedProject(e.target.value)}
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-cyan-500/50 focus:bg-white/10 transition-all outline-none appearance-none cursor-pointer"
+              >
+                <option value="" disabled className="bg-gray-900">Select Project Vault</option>
+                {projects.map((project) => (
+                  <option key={project._id} value={project._id} className="bg-gray-900">
+                    {project.name}
+                  </option>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+              </select>
+            </div>
 
-      {/* Create Secret Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold mb-4" style={{color: '#132440'}}>
-              Create New Secret
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                  Project *
-                </label>
-                <select
-                  value={formData.projectId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, projectId: e.target.value })
-                  }
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                >
-                  <option value="">Select a project</option>
-                  {projects.map((project) => (
-                    <option key={project._id} value={project._id}>
-                      {project.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                  Environment *
-                </label>
-                <select
-                  value={formData.environment}
-                  onChange={(e) =>
-                    setFormData({ ...formData, environment: e.target.value })
-                  }
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                >
-                  {environments.map((env) => (
-                    <option key={env} value={env}>
-                      {env.charAt(0).toUpperCase() + env.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                  Key *
-                </label>
-                <input
-                  type="text"
-                  value={formData.key}
-                  onChange={(e) =>
-                    setFormData({ ...formData, key: e.target.value })
-                  }
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-mono"
-                  placeholder="DATABASE_URL"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                  Value *
-                </label>
-                <textarea
-                  value={formData.value}
-                  onChange={(e) =>
-                    setFormData({ ...formData, value: e.target.value })
-                  }
-                  required
-                  rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-mono"
-                  placeholder="mongodb://localhost:27017/mydb"
-                />
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              )}
-
-              <div className="flex items-center space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false);
-                    setError('');
-                  }}
-                  className="flex-1 px-4 py-2 border border-gray-300 style={{color: 'var(--color-text-primary)'}} rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 px-4 py-2 text-white rounded-lg transition-all disabled:opacity-50 gradient-primary"
-                >
-                  {submitting ? 'Creating...' : 'Create Secret'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Bulk Import Modal */}
-      {showBulkModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold style={{color: 'var(--color-text-primary)'}} mb-4">
-              Bulk Import Secrets from .env File
-            </h2>
-
-            <div className="space-y-4">
-              {/* Project and Environment Selection */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                    Project *
-                  </label>
-                  <select
-                    value={selectedProject}
-                    onChange={(e) => setSelectedProject(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1 flex items-center space-x-2">
+                <Terminal className="w-3 h-3" />
+                <span>Deployment Environment</span>
+              </label>
+              <div className="flex p-1.5 rounded-xl bg-black/40 border border-white/5">
+                {environments.map((env) => (
+                  <button
+                    key={env}
+                    onClick={() => setSelectedEnv(env)}
+                    className={`flex-1 py-3 px-2 sm:px-4 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
+                      selectedEnv === env 
+                      ? 'bg-white/10 text-white shadow-lg' 
+                      : 'text-white/30 hover:text-white/60'
+                    }`}
                   >
-                    <option value="">Select a project</option>
-                    {projects.map((project) => (
-                      <option key={project._id} value={project._id}>
-                        {project.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                    Environment *
-                  </label>
-                  <select
-                    value={selectedEnv}
-                    onChange={(e) => setSelectedEnv(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  >
-                    {environments.map((env) => (
-                      <option key={env} value={env}>
-                        {env.charAt(0).toUpperCase() + env.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Import Mode Tabs */}
-              <div className="flex border-b border-gray-200">
-                <button
-                  onClick={() => {
-                    setImportMode('upload');
-                    setBulkEnvContent('');
-                    setParsedSecrets([]);
-                    setError('');
-                  }}
-                  className={`px-4 py-2 font-medium text-sm transition-colors ${
-                    importMode === 'upload'
-                      ? 'border-b-2 border-blue-600 text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <FileUp className="w-4 h-4 inline mr-2" />
-                  Upload File
-                </button>
-                <button
-                  onClick={() => {
-                    setImportMode('paste');
-                    setUploadedFileName('');
-                    setParsedSecrets([]);
-                    setError('');
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = '';
-                    }
-                  }}
-                  className={`px-4 py-2 font-medium text-sm transition-colors ${
-                    importMode === 'paste'
-                      ? 'border-b-2 border-blue-600 text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Copy className="w-4 h-4 inline mr-2" />
-                  Paste Content
-                </button>
-              </div>
-
-              {/* File Upload Section */}
-              {importMode === 'upload' && (
-                <div>
-                  <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                    Upload .env File *
-                  </label>
-                  {!uploadedFileName ? (
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".env,.env.local,.env.example"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                        id="file-upload"
-                      />
-                      <label
-                        htmlFor="file-upload"
-                        className="cursor-pointer flex flex-col items-center"
-                      >
-                        <FileUp className="w-12 h-12 text-gray-400 mb-3" />
-                        <span className="text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-1">
-                          Click to upload or drag and drop
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          .env, .env.local, or .env.example files only
-                        </span>
-                      </label>
-                    </div>
-                  ) : (
-                    <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <FileUp className="w-5 h-5 text-green-600" />
-                        <div>
-                          <p className="text-sm font-medium style={{color: 'var(--color-text-primary)'}}">
-                            {uploadedFileName}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {parsedSecrets.length > 0
-                              ? `${parsedSecrets.length} secrets parsed`
-                              : 'File uploaded'}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={handleRemoveFile}
-                        className="text-gray-400 hover:text-red-600 transition-colors"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Paste Content Section */}
-              {importMode === 'paste' && (
-                <div>
-                  <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                    Paste .env Content *
-                  </label>
-                  <textarea
-                    value={bulkEnvContent}
-                    onChange={(e) => {
-                      setBulkEnvContent(e.target.value);
-                      setParsedSecrets([]);
-                      setError('');
-                    }}
-                    rows={10}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-mono text-sm"
-                    placeholder={`DATABASE_URL=mongodb://localhost:27017/mydb
-API_KEY=sk-1234567890
-JWT_SECRET=your-secret-key
-PORT=3000
-# Comments are ignored`}
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    Paste your .env file content. Each line should be in KEY=VALUE format.
-                    Comments (lines starting with #) and empty lines will be ignored.
-                  </p>
-                </div>
-              )}
-
-              {/* Parse Button */}
-              {(importMode === 'paste' || uploadedFileName) && (
-                <button
-                  onClick={() => handleBulkParse()}
-                  disabled={(!bulkEnvContent.trim() && !uploadedFileName) || !selectedProject}
-                  className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {uploadedFileName && parsedSecrets.length === 0
-                    ? 'Parse Secrets from File'
-                    : 'Parse Secrets'}
-                </button>
-              )}
-
-              {/* Parsed Secrets Preview */}
-              {parsedSecrets.length > 0 && (
-                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold style={{color: 'var(--color-text-primary)'}}">
-                      Preview ({parsedSecrets.length} secrets found)
-                    </h3>
-                    <span className="text-xs text-gray-500">
-                      Review before adding
-                    </span>
-                  </div>
-                  <div className="max-h-64 overflow-y-auto space-y-2">
-                    {parsedSecrets.map((secret, index) => (
-                      <div
-                        key={index}
-                        className="bg-white border border-gray-200 rounded-lg p-3 flex items-center justify-between"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <code className="text-sm font-mono style={{color: 'var(--color-text-primary)'}} block truncate">
-                            {secret.key}
-                          </code>
-                          <span className="text-xs text-gray-500">
-                            {secret.value.length > 50
-                              ? `${secret.value.substring(0, 50)}...`
-                              : secret.value}
-                          </span>
-                        </div>
-                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 ml-2" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Success Message */}
-              {bulkSuccess && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <p className="text-sm text-green-700">
-                    Successfully created {parsedSecrets.length} secrets!
-                  </p>
-                </div>
-              )}
-
-              {/* Error Message */}
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex items-center space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowBulkModal(false);
-                    setBulkEnvContent('');
-                    setParsedSecrets([]);
-                    setError('');
-                    setBulkSuccess(false);
-                    setUploadedFileName('');
-                    setImportMode('paste');
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = '';
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 border border-gray-300 style={{color: 'var(--color-text-primary)'}} rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleBulkSubmit}
-                  disabled={
-                    bulkSubmitting ||
-                    parsedSecrets.length === 0 ||
-                    !selectedProject ||
-                    bulkSuccess
-                  }
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {bulkSubmitting
-                    ? `Creating ${parsedSecrets.length} secrets...`
-                    : `Add ${parsedSecrets.length} Secrets`}
-                </button>
+                    {env}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* View Secret Value Modal */}
-      {showValueModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold style={{color: 'var(--color-text-primary)'}} mb-4">
-              Secret Value
-            </h2>
-
-            {loadingValue ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium style={{color: 'var(--color-text-primary)'}} mb-2">
-                    Value (Decrypted)
-                  </label>
-                  <div className="relative">
-                    <textarea
-                      readOnly
-                      value={secretValue}
-                      rows={6}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm"
-                    />
-                    <button
-                      onClick={() => copyToClipboard(secretValue)}
-                      className="absolute top-2 right-2 p-2 text-gray-500 hover:style={{color: 'var(--color-text-primary)'}}"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-xs text-yellow-800">
-                    ⚠️ This secret value is decrypted. Keep it secure and
-                    never share it.
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setShowValueModal(null);
-                    setSecretValue('');
-                  }}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            )}
+        {/* Error Messaging */}
+        {error && (
+          <div className="hero-glass-card border-red-500/30 p-4 bg-red-500/5 flex items-center space-x-3">
+            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <p className="text-sm font-bold text-red-200">{error}</p>
+            <button onClick={() => setError('')} className="ml-auto text-white/20 hover:text-white"><X className="w-4 h-4" /></button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Edit Secret Modal */}
-      {showEditModal && selectedSecret && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{backgroundColor: 'rgba(19, 36, 64, 0.7)'}}>
-          <div className="rounded-xl shadow-2xl max-w-md w-full p-6" style={{backgroundColor: 'var(--color-bg-card)'}}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold" style={{color: '#132440'}}>
-                Edit Secret
-              </h2>
-              <button
-                onClick={() => {
-                  setShowEditModal(false);
-                  setSelectedSecret(null);
-                  setFormData({
-                    projectId: selectedProject,
-                    environment: selectedEnv,
-                    key: '',
-                    value: '',
-                  });
-                  setError('');
-                }}
-                className="p-1 rounded-lg transition-colors"
-                style={{color: '#718096'}}
-                onMouseEnter={(e) => e.currentTarget.style.color = '#132440'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#718096'}
-              >
-                <X className="w-5 h-5" />
-              </button>
+        {/* Main Records Table */}
+        {!selectedProject ? (
+          <div className="hero-glass-card py-24 text-center border-dashed border-white/10">
+            <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6">
+              <Shield className="w-10 h-10 text-white/10" />
             </div>
-
-            <form onSubmit={handleUpdateSecret} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{color: '#132440'}}>
-                  Key *
-                </label>
-                <input
-                  type="text"
-                  value={formData.key}
-                  onChange={(e) => setFormData({ ...formData, key: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border rounded-lg outline-none transition-all font-mono"
-                  style={{borderColor: '#E2E8F0'}}
-                  onFocus={(e) => e.target.style.borderColor = '#3B9797'}
-                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                  placeholder="DATABASE_URL"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{color: '#132440'}}>
-                  Value *
-                </label>
-                <textarea
-                  value={formData.value}
-                  onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                  required
-                  rows={4}
-                  className="w-full px-4 py-2 border rounded-lg outline-none transition-all font-mono"
-                  style={{borderColor: '#E2E8F0'}}
-                  onFocus={(e) => e.target.style.borderColor = '#3B9797'}
-                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                  placeholder="mongodb://localhost:27017/mydb"
-                />
-              </div>
-
-              {error && (
-                <div className="border rounded-lg p-3" style={{backgroundColor: 'rgba(191, 9, 47, 0.1)', borderColor: '#BF092F'}}>
-                  <p className="text-sm" style={{color: '#BF092F'}}>{error}</p>
-                </div>
-              )}
-
-              <div className="flex items-center space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setSelectedSecret(null);
-                    setFormData({
-                      projectId: selectedProject,
-                      environment: selectedEnv,
-                      key: '',
-                      value: '',
-                    });
-                    setError('');
-                  }}
-                  className="flex-1 px-4 py-2 border rounded-lg transition-colors"
-                  style={{borderColor: '#E2E8F0', color: '#4A5568'}}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8F9FA'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 px-4 py-2 text-white rounded-lg transition-all disabled:opacity-50 gradient-primary"
-                >
-                  {submitting ? 'Updating...' : 'Update Secret'}
-                </button>
-              </div>
-            </form>
+            <h3 className="text-xl font-bold text-white/40">Awaiting Vault Selection</h3>
           </div>
-        </div>
-      )}
-
-      {/* Delete Secret Modal */}
-      {showDeleteModal && selectedSecret && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{backgroundColor: 'rgba(19, 36, 64, 0.7)'}}>
-          <div className="rounded-xl shadow-2xl max-w-md w-full p-6" style={{backgroundColor: 'var(--color-bg-card)'}}>
-            <h2 className="text-2xl font-bold mb-4" style={{color: '#132440'}}>
-              Delete Secret
-            </h2>
-            <p className="mb-6" style={{color: '#4A5568'}}>
-              Are you sure you want to delete the secret <strong className="font-mono">{selectedSecret.key}</strong>? 
-              This action cannot be undone.
+        ) : loading ? (
+          <div className="flex justify-center py-24">
+             <div className="w-12 h-12 rounded-full border-4 border-white/5 border-t-cyan-500 animate-spin" />
+          </div>
+        ) : secrets.length === 0 ? (
+          <div className="hero-glass-card py-24 text-center border-dashed border-white/10">
+            <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-10 h-10 text-white/20" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">No Secrets Defined</h3>
+            <p className="text-white/40 max-w-sm mx-auto mb-8 text-sm">
+              This environment is currently devoid of runtime configurations. Initialize your first industrial-grade secret.
             </p>
+            <button onClick={() => setShowModal(true)} className="btn-purple px-10 py-4 font-bold tracking-tight">Initialize Secret</button>
+          </div>
+        ) : (
+          <div className="hero-glass-card overflow-hidden border-white/5 pb-10">
+             <div className="overflow-x-auto custom-scrollbar">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-white/5 border-b border-white/10">
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Identifier Key</th>
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Auth Method</th>
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Created At</th>
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40 text-right">Operations</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {secrets.map((secret) => (
+                      <tr key={secret._id} className="group hover:bg-white/5 transition-colors">
+                        <td className="px-8 py-6">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-2 rounded-lg bg-white/5 text-purple-400 group-hover:bg-purple-500/10 group-hover:text-purple-300 transition-all">
+                               <Key className="w-4 h-4" />
+                            </div>
+                            <code className="text-sm font-black text-white group-hover:text-purple-400 transition-colors uppercase tracking-tight">{secret.key}</code>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                           <span className="px-3 py-1 rounded-lg border border-cyan-500/20 bg-cyan-500/5 text-[9px] font-black uppercase tracking-widest text-cyan-400">ENCRYPTED_MEMORY</span>
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex items-center space-x-2 text-white/30 text-xs">
+                             <Clock className="w-3 h-3" />
+                             <span className="font-bold">{new Date(secret.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <div className="flex items-center justify-end space-x-1 opacity-20 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => handleViewValue(secret._id)} className="p-2.5 rounded-xl bg-white/5 text-white/60 hover:text-cyan-400 hover:bg-white/10 transition-all" title="Decrypt Temporary">
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleEditSecret(secret)} className="p-2.5 rounded-xl bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-all" title="Modify Protocol">
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => { setSelectedSecret(secret); setShowDeleteModal(true); }} className="p-2.5 rounded-xl bg-white/5 text-white/60 hover:text-red-400 hover:bg-red-500/10 transition-all" title="Terminate Secret">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+             </div>
+          </div>
+        )}
 
-            {error && (
-              <div className="border rounded-lg p-3 mb-4" style={{backgroundColor: 'rgba(191, 9, 47, 0.1)', borderColor: '#BF092F'}}>
-                <p className="text-sm" style={{color: '#BF092F'}}>{error}</p>
+        {/* Modals - All Decentred and High-Tech */}
+        {(showModal || showEditModal) && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+             <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => { setShowModal(false); setShowEditModal(false); }} />
+             <div className="hero-glass-card max-w-lg w-full p-6 sm:p-10 relative z-10 scale-in shadow-[0_0_100px_rgba(168,85,247,0.1)]">
+                <div className="flex items-center justify-between mb-8">
+                   <div className="flex items-center space-x-3">
+                      <Shield className="w-6 h-6 text-purple-400" />
+                      <h2 className="text-2xl font-black text-white tracking-tight">{showModal ? 'Define New Secret' : 'Modify Encryption'}</h2>
+                   </div>
+                   <button onClick={() => { setShowModal(false); setShowEditModal(false); }} className="text-white/20 hover:text-white"><X className="w-6 h-6" /></button>
+                </div>
+
+                <form onSubmit={showModal ? handleSubmit : handleUpdateSecret} className="space-y-6">
+                   <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2 col-span-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Identity Key</label>
+                        <input
+                          type="text"
+                          value={formData.key}
+                          onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+                          required
+                          className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 outline-none font-mono"
+                          placeholder="E.g. MASTER_KEY_01"
+                        />
+                      </div>
+                      {showModal && (
+                        <>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Environment</label>
+                            <select className="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10 text-white outline-none">
+                                {environments.map(e => <option key={e} value={e} className="bg-gray-900">{e.toUpperCase()}</option>)}
+                            </select>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Methods</label>
+                            <div className="px-4 py-4 rounded-xl bg-white/5 border border-white/10 text-white/40 text-[10px] font-black tracking-widest uppercase">AES_256_GCM</div>
+                          </div>
+                        </>
+                      )}
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Secret Value (To Be Encrypted)</label>
+                      <textarea
+                        value={formData.value}
+                        onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+                        required
+                        rows={4}
+                        className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 outline-none resize-none font-mono"
+                        placeholder="Enter sensitive payload..."
+                      />
+                   </div>
+
+                   <button type="submit" disabled={submitting} className="btn-purple w-full py-5 font-black uppercase tracking-widest text-xs shadow-lg shadow-purple-500/20 mt-4">
+                      {submitting ? 'Encrypting Protocol...' : (showModal ? 'Configure Secret' : 'Deploy Modification')}
+                   </button>
+                </form>
+             </div>
+          </div>
+        )}
+
+        {/* Value Display Modal */}
+        {showValueModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+             <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setShowValueModal(null)} />
+             <div className="hero-glass-card max-w-md w-full p-8 relative z-10 scale-in border-cyan-500/30">
+                <div className="text-center space-y-6">
+                   <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto">
+                      <Lock className="w-8 h-8 text-cyan-400" />
+                   </div>
+                   <div>
+                      <h2 className="text-2xl font-black text-white uppercase tracking-tight">Decrypted Buffer</h2>
+                      <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mt-1">Temporary Memory Access Only</p>
+                   </div>
+
+                   <div className="relative group/val">
+                      <textarea
+                        readOnly
+                        value={secretValue}
+                        rows={5}
+                        className="w-full p-6 rounded-2xl bg-black/60 border border-white/10 text-cyan-400 font-mono text-sm leading-relaxed outline-none"
+                      />
+                      <button onClick={() => copyToClipboard(secretValue)} className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 text-white/40 hover:text-white transition-all border border-white/5">
+                         <Copy className="w-4 h-4" />
+                      </button>
+                   </div>
+
+                   <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/10 text-[10px] font-black text-red-400 uppercase tracking-widest">
+                      ⚠️ Decrypted data detected. Purge buffer after use.
+                   </div>
+
+                   <button onClick={() => setShowValueModal(null)} className="w-full py-4 text-xs font-black uppercase tracking-[0.5em] text-white/20 hover:text-white transition-all">TERMINATE VIEW</button>
+                </div>
+             </div>
+          </div>
+        )}
+
+        {/* Bulk Import Modal */}
+        {showBulkModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+             <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowBulkModal(false)} />
+             <div className="hero-glass-card max-w-3xl w-full p-6 sm:p-10 relative z-10 scale-in max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="flex items-center justify-between mb-8">
+                   <div className="flex items-center space-x-3">
+                      <Upload className="w-6 h-6 text-cyan-400" />
+                      <h2 className="text-2xl font-black text-white tracking-tight">Bulk Extraction Protocol</h2>
+                   </div>
+                   <button onClick={() => setShowBulkModal(false)} className="text-white/20 hover:text-white"><X className="w-6 h-6" /></button>
+                </div>
+
+                <div className="space-y-6">
+                   <div className="flex space-x-2 p-1.5 rounded-xl bg-black/40 border border-white/5">
+                      <button onClick={() => setImportMode('upload')} className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${importMode === 'upload' ? 'bg-white/10 text-white' : 'text-white/30'}`}>Load File (.env)</button>
+                      <button onClick={() => setImportMode('paste')} className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${importMode === 'paste' ? 'bg-white/10 text-white' : 'text-white/30'}`}>Buffer Paste</button>
+                   </div>
+
+                   {importMode === 'upload' ? (
+                      <div className="border-2 border-dashed border-white/10 rounded-3xl p-12 text-center hover:border-cyan-500/40 transition-all group/up cursor-pointer relative">
+                         <input ref={fileInputRef} type="file" accept=".env,.env.local,.env.example" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                         <FileUp className="w-12 h-12 text-white/10 mx-auto mb-4 group-hover/up:text-cyan-400 transition-colors" />
+                         <p className="text-sm font-bold text-white/60">{uploadedFileName || 'Drop .env file here or click to scan'}</p>
+                         <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mt-2">{uploadedFileName ? 'Target Loaded' : 'Awaiting Metadata'}</p>
+                      </div>
+                   ) : (
+                      <textarea
+                        value={bulkEnvContent}
+                        onChange={(e) => setBulkEnvContent(e.target.value)}
+                        rows={10}
+                        className="w-full p-6 rounded-2xl bg-black/60 border border-white/10 text-cyan-400 font-mono text-sm leading-relaxed outline-none"
+                        placeholder="KEY_01=VALUE_01&#10;KEY_02=VALUE_02"
+                      />
+                   )}
+
+                   {parsedSecrets.length > 0 && (
+                      <div className="space-y-4">
+                         <div className="flex items-center justify-between">
+                            <h4 className="text-[10px] uppercase font-black tracking-widest text-white/40">Extraction Preview ({parsedSecrets.length} identified)</h4>
+                            <div className="h-px flex-1 bg-white/5 mx-4" />
+                         </div>
+                         <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                            {parsedSecrets.map((s, i) => (
+                               <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                                  <code className="text-[10px] font-bold text-cyan-400 truncate pr-4">{s.key}</code>
+                                  <CheckCircle className="w-3 h-3 text-emerald-500" />
+                               </div>
+                            ))}
+                         </div>
+                      </div>
+                   )}
+
+                   <div className="flex items-center space-x-4 pt-4 border-t border-white/5">
+                      <button onClick={() => setShowBulkModal(false)} className="flex-1 py-4 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white">Abort</button>
+                      <button
+                        onClick={parsedSecrets.length > 0 ? handleBulkSubmit : () => handleBulkParse()}
+                        disabled={bulkSubmitting || bulkSuccess}
+                        className="flex-[2] btn-purple py-4 font-black uppercase tracking-widest text-xs shadow-lg shadow-purple-500/20"
+                      >
+                        {bulkSubmitting ? 'Injecting Sequences...' : (parsedSecrets.length > 0 ? `Initialize ${parsedSecrets.length} Identities` : 'Parse Metadata')}
+                      </button>
+                   </div>
+                </div>
+             </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && selectedSecret && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowDeleteModal(false)} />
+            <div className="hero-glass-card max-w-md w-full p-6 sm:p-10 relative z-10 scale-in border-red-500/30 shadow-red-500/10">
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
+                  <Trash2 className="w-8 h-8 text-red-500" />
+                </div>
+                <h2 className="text-2xl font-black text-white tracking-tight mb-4">Critical Erasure</h2>
+                <p className="text-white/50 text-sm mb-10 leading-relaxed">
+                  You are about to purge the identity <span className="text-white font-mono font-bold">{selectedSecret.key}</span>. This deletion is atomic and irreversible.
+                </p>
+
+                <div className="flex flex-col space-y-3">
+                  <button
+                    onClick={handleDeleteSecret}
+                    disabled={submitting}
+                    className="w-full py-4 rounded-xl bg-red-500 text-white font-black uppercase tracking-widest text-xs hover:bg-red-400 transition-all"
+                  >
+                    Confirm Termination
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="w-full py-4 text-white/30 hover:text-white text-xs font-black uppercase tracking-widest transition-all"
+                  >
+                    Cancel Directive
+                  </button>
+                </div>
               </div>
-            )}
-
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setSelectedSecret(null);
-                  setError('');
-                }}
-                disabled={submitting}
-                className="flex-1 px-4 py-2 border rounded-lg transition-colors"
-                style={{borderColor: '#E2E8F0', color: '#4A5568'}}
-                onMouseEnter={(e) => !submitting && (e.currentTarget.style.backgroundColor = '#F8F9FA')}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteSecret}
-                disabled={submitting}
-                className="flex-1 px-4 py-2 text-white rounded-lg transition-all disabled:opacity-50"
-                style={{backgroundColor: '#BF092F'}}
-                onMouseEnter={(e) => !submitting && (e.currentTarget.style.backgroundColor = '#9A0726')}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#BF092F'}
-              >
-                {submitting ? 'Deleting...' : 'Delete Secret'}
-              </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </PageTransition>
   );
 };
 
 export default Secrets;
-

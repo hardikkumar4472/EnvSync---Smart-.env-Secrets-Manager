@@ -22,6 +22,10 @@
     --color-text-primary: #132440;
     --color-text-secondary: #4A5568;
     --color-text-light: #718096;
+    --bg-image: url('/envsync_bg_light.png');
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --hero-card-bg: rgba(255, 255, 255, 0.3);
   }
 
   /* Black Mode - True Black Theme */
@@ -45,6 +49,10 @@
     --color-text-primary: #FFFFFF;
     --color-text-secondary: #E0E0E0;
     --color-text-light: #B0B0B0;
+    --bg-image: url('/envsync_bg_dark.png');
+    --glass-bg: rgba(0, 0, 0, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --hero-card-bg: rgba(0, 0, 0, 0.4);
   }
 
   * {
@@ -166,6 +174,149 @@
   .scroll-snap-start {
     scroll-snap-align: start;
   }
+
+  .homepage-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+  }
+
+  .glass-card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border) !important;
+  }
+
+  .glass-header {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-footer {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .btn-purple {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    @apply text-white font-bold py-2 px-6 rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/30;
+  }
+
+  .btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    @apply text-white font-semibold py-2 px-6 rounded-full transition-all hover:bg-white/20 active:scale-95;
+  }
+
+  .hero-glass-card {
+    background: var(--hero-card-bg) !important;
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 40px;
+  }
+
+  .feature-compact-card {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    @apply p-4 rounded-xl transition-all hover:bg-white/5;
+  }
+
+  .text-gradient-cyan {
+    background: linear-gradient(to right, #ffffff 0%, #2dd4bf 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Cyber Security Animations */
+  .scanline {
+    width: 100%;
+    height: 100px;
+    z-index: 999;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(45, 212, 191, 0.2) 50%, rgba(0, 0, 0, 0) 100%);
+    opacity: 0.1;
+    position: fixed;
+    bottom: 100%;
+    animation: scanline 6s linear infinite;
+    pointer-events: none;
+  }
+
+  .terminal-loader {
+    font-family: 'Courier New', Courier, monospace;
+    @apply text-cyan-400 font-bold;
+  }
+
+  .glitch {
+    position: relative;
+    animation: glitch-skew 1s infinite linear alternate-reverse;
+  }
+
+  .access-status {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 5rem;
+    font-weight: 900;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+  }
+
+  .access-granted {
+    color: #2dd4bf;
+    text-shadow: 0 0 20px rgba(45, 212, 191, 0.8);
+    animation: blink 0.1s infinite;
+  }
+
+  .access-denied {
+    color: #ef4444;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+    animation: shake 0.5s ease-in-out;
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(0); bottom: 100%; }
+  100% { transform: translateY(100vh); bottom: 0%; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(-1deg); }
+  40% { transform: skew(1deg); }
+  60% { transform: skew(-0.5deg); }
+  80% { transform: skew(0.5deg); }
+  100% { transform: skew(0deg); }
 }
 
 @keyframes fadeIn {

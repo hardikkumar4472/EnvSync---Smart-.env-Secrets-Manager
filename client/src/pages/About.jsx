@@ -1,349 +1,189 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Lock, Zap, FileText, ArrowRight, CheckCircle, Code, Database, Key, BookOpen, Moon, Sun } from 'lucide-react';
-import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import { Shield, ArrowRight, BookOpen, Moon, Sun, ChevronDown, Lock, Zap, FileText, CheckCircle, Database, Key, Code, User, Github, Linkedin, Mail, X } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const About = () => {
   const { isDarkMode, toggleDarkMode } = useTheme();
-  const [heroRef, heroVisible] = useScrollAnimation({ once: true });
-  const [featuresRef, featuresVisible] = useScrollAnimation({ once: true });
-  const [problemRef, problemVisible] = useScrollAnimation({ once: true });
-  const [howItWorksRef, howItWorksVisible] = useScrollAnimation({ once: true });
-  const [keyFeaturesRef, keyFeaturesVisible] = useScrollAnimation({ once: true });
-  const [ctaRef, ctaVisible] = useScrollAnimation({ once: true });
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState('');
+  const [isDevModalOpen, setIsDevModalOpen] = useState(false);
+
+  useEffect(() => {
+    const sequences = ['INITIALIZING...', 'ENCRYPTING...', 'ACCESS GRANTED.'];
+    let currentLine = 0;
+    const interval = setInterval(() => {
+      if (currentLine < sequences.length) {
+        setLoadingText(sequences[currentLine]);
+        currentLine++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => setIsLoading(false), 500);
+      }
+    }, 400);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-[2000] font-mono">
+        <div className="text-cyan-400 text-2xl mb-8 glitch" data-text={loadingText}>{loadingText}</div>
+        <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-full bg-cyan-500 animate-[loading-bar_1s_infinite]" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen" style={{background: 'linear-gradient(to bottom, var(--color-bg-light) 0%, var(--color-bg-light) 100%)'}}>
-      {/* Header */}
-      <header className="shadow-sm border-b" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center gradient-primary">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold" style={{color: 'var(--color-text-primary)'}}>EnvSync</h1>
-                <p className="text-xs" style={{color: 'var(--color-text-light)'}}>Secure Secret Management</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              {/* Dark Mode Toggle */}
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-lg transition-all"
-                style={{
-                  backgroundColor: isDarkMode ? 'rgba(77, 179, 179, 0.1)' : 'rgba(22, 71, 106, 0.1)',
-                  color: isDarkMode ? '#4DB3B3' : '#16476A'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                {isDarkMode ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </button>
+    <div className="min-h-screen bg-transparent relative">
+      {/* Background Layer */}
+      <div className="homepage-bg" />
+      <div className="scanline" />
 
-              <Link
-                to="/app/documentation"
-                className="px-6 py-2 border-2 rounded-lg transition-all font-medium flex items-center space-x-2"
-                style={{borderColor: '#3B9797', color: '#3B9797'}}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3B9797';
-                  e.currentTarget.style.color = '#FFFFFF';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#3B9797';
-                }}
-              >
-                <BookOpen className="w-4 h-4" />
-                <span>View Documentation</span>
-              </Link>
-              <Link
-                to="/login"
-                className="px-6 py-2 text-white rounded-lg transition-all font-medium gradient-primary"
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-              >
-                Get Started
-              </Link>
-            </div>
+      {/* Header */}
+      <header className="glass-header px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 shadow-lg p-1.5 overflow-hidden">
+            <img src="/logo.svg" alt="EnvSync Logo" className="w-full h-full object-contain" />
           </div>
+          <span className="text-2xl font-black text-white">EnvSync</span>
+        </div>
+
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          <button 
+            onClick={() => setIsDevModalOpen(true)}
+            className="hidden md:flex items-center space-x-2 text-white/80 hover:text-white transition-colors font-medium text-sm sm:text-base"
+          >
+            <User className="w-4 h-4" />
+            <span>Developer</span>
+          </button>
+          <Link to="/app/documentation" className="hidden md:flex items-center space-x-2 text-white/80 hover:text-white transition-colors font-medium text-sm sm:text-base">
+            <BookOpen className="w-4 h-4" />
+            <span>Docs</span>
+          </Link>
+          <Link to="/login" className="text-white/80 hover:text-white transition-colors font-medium text-sm sm:text-base">Log In</Link>
+          <Link to="/register" className="btn-purple px-4 sm:px-8 text-xs sm:text-base">Sign Up</Link>
+          <button onClick={toggleDarkMode} className="p-2.5 rounded-full bg-white/10 border border-white/20 text-white">
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section ref={heroRef} className={`max-w-7xl mx-auto px-6 py-20 ${heroVisible ? 'fade-in-up' : 'opacity-0'}`}>
-        <div className="text-center mb-16">
-          <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 gradient-primary shadow-lg ${heroVisible ? 'scale-in delay-200' : 'opacity-0'}`}>
-            <Shield className="w-10 h-10 text-white" />
+      {/* Hero Content */}
+      <main className="relative z-10 pt-32 pb-20 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col items-center">
+          
+          <div className="hero-glass-card max-w-4xl w-full p-8 sm:p-12 md:p-20 text-center mb-16 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 tracking-tighter leading-tight">
+              Secure Runtime. <br />
+              <span className="text-cyan-400">Injected in Memory.</span>
+            </h1>
+            <p className="text-sm sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10">
+              Protect infrastructure by eliminating .env files. Military-grade encryption at rest and runtime injection.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+              <Link to="/login" className="btn-purple py-4 px-12 text-lg inline-flex items-center space-x-3 w-full sm:w-auto">
+                <span>Get Started Now</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link to="/app/documentation" className="btn-glass py-4 px-12 text-lg inline-flex items-center space-x-3 w-full sm:w-auto">
+                <BookOpen className="w-5 h-5" />
+                <span>Documentation</span>
+              </Link>
+            </div>
           </div>
-          <h1 className="text-5xl font-bold mb-4" style={{color: 'var(--color-text-primary)'}}>
-            EnvSync
-          </h1>
-          <p className="text-2xl mb-6" style={{color: 'var(--color-secondary)'}}>
-            Secure Runtime Secret Injection System
-          </p>
-          <p className="text-lg max-w-2xl mx-auto mb-8" style={{color: 'var(--color-text-secondary)'}}>
-            Eliminate the security risks of .env files by providing runtime-only secret injection.
-            Secrets are encrypted at rest, decrypted only in memory, and never written to disk.
-          </p>
-          <div className="flex items-center justify-center space-x-4">
-            <Link
-              to="/app/documentation"
-              className="inline-flex items-center space-x-2 border-2 px-8 py-4 rounded-lg transition-all text-lg font-medium shadow-md"
-              style={{backgroundColor: 'var(--color-bg-card)', borderColor: '#3B9797', color: '#3B9797'}}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#3B9797';
-                e.currentTarget.style.color = '#FFFFFF';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-bg-card)';
-                e.currentTarget.style.color = '#3B9797';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            <div className="feature-compact-card flex items-start space-x-4">
+              <Lock className="w-6 h-6 text-cyan-400 flex-shrink-0" />
+              <div><h3 className="text-white font-bold mb-1">Zero-Disk</h3><p className="text-white/50 text-sm">Secrets exist only in RAM.</p></div>
+            </div>
+            <div className="feature-compact-card flex items-start space-x-4">
+              <Zap className="w-6 h-6 text-purple-400 flex-shrink-0" />
+              <div><h3 className="text-white font-bold mb-1">Instant</h3><p className="text-white/50 text-sm">CLI integration for any framework.</p></div>
+            </div>
+            <div className="feature-compact-card flex items-start space-x-4">
+              <FileText className="w-6 h-6 text-indigo-400 flex-shrink-0" />
+              <div><h3 className="text-white font-bold mb-1">Audit</h3><p className="text-white/50 text-sm">Track every secret access request.</p></div>
+            </div>
+          </div>
+
+          <div className="w-full mt-32 space-y-32">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="hero-glass-card p-10 border-l-8 border-red-500/50">
+                <h2 className="text-3xl font-black mb-6 text-red-500 uppercase">The Problem</h2>
+                <ul className="space-y-4 text-white/80">
+                  {['.env files in plain text', 'Secrets committed to Git', 'Shared insecurely'].map((t, i) => <li key={i}>✕ {t}</li>)}
+                </ul>
+              </div>
+              <div className="hero-glass-card p-10 border-l-8 border-cyan-500/50">
+                <h2 className="text-3xl font-black mb-6 text-cyan-500 uppercase">The Solution</h2>
+                <ul className="space-y-4 text-white/80">
+                  {['Encrypted storage', 'Memory-only decryption', 'Zero plain text'].map((t, i) => <li key={i}>✓ {t}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            <div className="hero-glass-card p-12 text-center">
+              <h2 className="text-4xl font-extrabold mb-12 text-white">How It Works</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                {['Project', 'Secrets', 'CLI', 'Logs'].map((s, i) => (
+                  <div key={i}>
+                    <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 bg-white/10 text-white font-bold text-2xl">{i+1}</div>
+                    <h3 className="text-white font-bold">{s}</h3>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Developer Modal */}
+      {isDevModalOpen && (
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsDevModalOpen(false)} />
+          <div className="hero-glass-card max-w-md w-full p-8 relative z-10 scale-in shadow-[0_0_100px_rgba(45,212,191,0.2)]">
+            <button 
+              onClick={() => setIsDevModalOpen(false)}
+              className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
             >
-              <BookOpen className="w-5 h-5" />
-              <span>View Documentation</span>
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center space-x-2 text-white px-8 py-4 rounded-lg transition-all text-lg font-medium shadow-lg gradient-primary"
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <span>Get Started</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Features Grid */}
-        <div ref={featuresRef} className={`grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 ${featuresVisible ? '' : 'opacity-0'}`}>
-          <div className="rounded-xl shadow-md border p-6 transition-all hover:shadow-xl" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{backgroundColor: 'rgba(191, 9, 47, 0.1)'}}>
-              <Lock className="w-6 h-6" style={{color: '#BF092F'}} />
-            </div>
-            <h3 className="text-xl font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>
-              Military-Grade Encryption
-            </h3>
-            <p style={{color: 'var(--color-text-secondary)'}}>
-              AES-256-GCM encryption ensures your secrets are protected at rest with industry-standard security.
-            </p>
-          </div>
-
-          <div className="rounded-xl shadow-md border p-6 transition-all hover:shadow-xl" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{backgroundColor: 'rgba(59, 151, 151, 0.1)'}}>
-              <Zap className="w-6 h-6" style={{color: '#3B9797'}} />
-            </div>
-            <h3 className="text-xl font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>
-              Runtime-Only Decryption
-            </h3>
-            <p style={{color: 'var(--color-text-secondary)'}}>
-              Secrets exist only in memory. They're never written to disk, eliminating the risk of accidental exposure.
-            </p>
-          </div>
-
-          <div className="rounded-xl shadow-md border p-6 transition-all hover:shadow-xl" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{backgroundColor: 'rgba(22, 71, 106, 0.1)'}}>
-              <FileText className="w-6 h-6" style={{color: '#16476A'}} />
-            </div>
-            <h3 className="text-xl font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>
-              Complete Audit Trail
-            </h3>
-            <p style={{color: 'var(--color-text-secondary)'}}>
-              Every action is logged for compliance. Perfect for SOC2, HIPAA, and other regulatory requirements.
-            </p>
-          </div>
-        </div>
-
-        {/* Problem & Solution */}
-        <div ref={problemRef} className={`grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 ${problemVisible ? '' : 'opacity-0'}`}>
-          <div className={`rounded-xl p-8 border-2 ${problemVisible ? 'fade-in-left' : 'opacity-0'}`} style={{backgroundColor: 'rgba(191, 9, 47, 0.05)', borderColor: '#BF092F'}}>
-            <h2 className="text-2xl font-bold mb-4" style={{color: 'var(--color-text-primary)'}}>The Problem</h2>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <span className="mt-1" style={{color: '#BF092F'}}>✗</span>
-                <span style={{color: 'var(--color-text-secondary)'}}>.env files in plain text</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <span className="mt-1" style={{color: '#BF092F'}}>✗</span>
-                <span style={{color: 'var(--color-text-secondary)'}}>Secrets accidentally committed to Git</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <span className="mt-1" style={{color: '#BF092F'}}>✗</span>
-                <span style={{color: 'var(--color-text-secondary)'}}>Secrets shared via Slack/Email</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <span className="mt-1" style={{color: '#BF092F'}}>✗</span>
-                <span style={{color: 'var(--color-text-secondary)'}}>No audit trail of secret access</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <span className="mt-1" style={{color: '#BF092F'}}>✗</span>
-                <span style={{color: 'var(--color-text-secondary)'}}>Manual environment switching</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className={`rounded-xl p-8 border-2 ${problemVisible ? 'fade-in-right' : 'opacity-0'}`} style={{backgroundColor: 'rgba(59, 151, 151, 0.05)', borderColor: '#3B9797'}}>
-            <h2 className="text-2xl font-bold mb-4" style={{color: 'var(--color-text-primary)'}}>The Solution</h2>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#3B9797'}} />
-                <span style={{color: 'var(--color-text-secondary)'}}>Encrypted secrets in MongoDB</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#3B9797'}} />
-                <span style={{color: 'var(--color-text-secondary)'}}>Runtime-only decryption (in memory)</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#3B9797'}} />
-                <span style={{color: 'var(--color-text-secondary)'}}>Zero plain text files</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#3B9797'}} />
-                <span style={{color: 'var(--color-text-secondary)'}}>Complete audit trail</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{color: '#3B9797'}} />
-                <span style={{color: 'var(--color-text-secondary)'}}>Easy environment switching</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* How It Works */}
-        <div ref={howItWorksRef} className={`rounded-xl shadow-md border p-8 mb-20 ${howItWorksVisible ? 'fade-in-up' : 'opacity-0'}`} style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-          <h2 className="text-3xl font-bold mb-8 text-center" style={{color: 'var(--color-text-primary)'}}>
-            How It Works
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <X className="w-6 h-6" />
+            </button>
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 gradient-primary shadow-md">
-                <span className="text-2xl font-bold text-white">1</span>
+              <div className="w-24 h-24 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto mb-6">
+                <User className="w-12 h-12 text-cyan-400" />
               </div>
-              <h3 className="font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>Create Project</h3>
-              <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                Set up your application project in the admin dashboard
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md" style={{backgroundColor: '#3B9797'}}>
-                <span className="text-2xl font-bold text-white">2</span>
-              </div>
-              <h3 className="font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>Add Secrets</h3>
-              <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                Upload or paste your .env file. Secrets are encrypted automatically
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 gradient-secondary shadow-md">
-                <span className="text-2xl font-bold text-white">3</span>
-              </div>
-              <h3 className="font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>Use CLI</h3>
-              <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                Run your app with envsync CLI. Secrets are injected at runtime
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 gradient-accent shadow-md">
-                <span className="text-2xl font-bold text-white">4</span>
-              </div>
-              <h3 className="font-semibold mb-2" style={{color: 'var(--color-text-primary)'}}>Monitor</h3>
-              <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                View audit logs and track all secret access for compliance
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Key Features */}
-        <div ref={keyFeaturesRef} className="mb-20">
-          <h2 className="text-3xl font-bold mb-8 text-center" style={{color: 'var(--color-text-primary)'}}>
-            Key Features
-          </h2>
-          <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${keyFeaturesVisible ? '' : 'opacity-0'}`}>
-            <div className="flex items-start space-x-4 p-4 rounded-lg transition-all hover:shadow-md" style={{backgroundColor: 'var(--color-bg-card)'}}>
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: 'rgba(22, 71, 106, 0.1)'}}>
-                <Database className="w-5 h-5" style={{color: '#16476A'}} />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1" style={{color: 'var(--color-text-primary)'}}>Multi-Environment Support</h3>
-                <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                  Manage secrets for dev, staging, and production environments separately
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-4 p-4 rounded-lg transition-all hover:shadow-md" style={{backgroundColor: 'var(--color-bg-card)'}}>
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: 'rgba(59, 151, 151, 0.1)'}}>
-                <Key className="w-5 h-5" style={{color: '#3B9797'}} />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1" style={{color: 'var(--color-text-primary)'}}>Bulk Import</h3>
-                <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                  Upload .env files or paste content to create multiple secrets at once
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-4 p-4 rounded-lg transition-all hover:shadow-md" style={{backgroundColor: 'var(--color-bg-card)'}}>
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: 'rgba(191, 9, 47, 0.1)'}}>
-                <Code className="w-5 h-5" style={{color: '#BF092F'}} />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1" style={{color: 'var(--color-text-primary)'}}>Simple CLI</h3>
-                <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                  Easy-to-use command-line interface for developers
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-4 p-4 rounded-lg transition-all hover:shadow-md" style={{backgroundColor: 'var(--color-bg-card)'}}>
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: 'rgba(22, 71, 106, 0.1)'}}>
-                <Shield className="w-5 h-5" style={{color: '#16476A'}} />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1" style={{color: 'var(--color-text-primary)'}}>Role-Based Access</h3>
-                <p className="text-sm" style={{color: 'var(--color-text-light)'}}>
-                  Admin-only dashboard with complete control over secrets
-                </p>
+              <h2 className="text-3xl font-black text-white mb-2">Hardik Kumar</h2>
+              
+              <div className="space-y-4">
+                <a href="mailto:hardikv715@gmail.com" className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white/80 hover:text-white">
+                  <Mail className="w-5 h-5 text-red-500" />
+                  <span className="font-medium">hardikv715@gmail.com</span>
+                </a>
+                <a href="https://github.com/hardikkumar4472" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white/80 hover:text-white">
+                  <Github className="w-5 h-5 text-white" />
+                  <span className="font-medium">hardikkumar4472</span>
+                </a>
+                <a href="https://www.linkedin.com/in/hardik-kumar-63a4b3249" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white/80 hover:text-white">
+                  <Linkedin className="w-5 h-5 text-blue-500" />
+                  <span className="font-medium">LinkedIn Profile</span>
+                </a>
               </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* CTA Section */}
-        <div ref={ctaRef} className={`rounded-2xl p-12 text-center text-white shadow-2xl gradient-secondary ${ctaVisible ? 'scale-in' : 'opacity-0'}`}>
-          <h2 className="text-3xl font-bold mb-4">Ready to Secure Your Secrets?</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto" style={{color: '#E8EEF2'}}>
-            Start managing your environment variables securely today. No more .env files in your repository.
-          </p>
-          <Link
-            to="/login"
-            className="inline-flex items-center space-x-2 px-8 py-4 rounded-lg transition-all text-lg font-medium shadow-lg gradient-primary"
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            <span>Get Started</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+      <footer className="py-16 glass-footer text-center mt-20 relative z-10">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 p-2 overflow-hidden mx-auto">
+            <img src="/logo.svg" alt="EnvSync Logo" className="w-full h-full object-contain" />
+          </div>
+          <span className="text-2xl font-black text-white">EnvSync</span>
         </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8" style={{backgroundColor: '#132440'}}>
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-sm" style={{color: '#A0AEC0'}}>
-            Made with ❤️ for secure secret management | EnvSync © 2025
-          </p>
-        </div>
+        <p className="text-white/30 text-[10px] uppercase tracking-widest mt-4">© 2026 | All Rights Reserved</p>
       </footer>
     </div>
   );

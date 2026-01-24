@@ -7,13 +7,18 @@ import {
   FileText,
   Activity,
   Shield,
+  Zap,
+  Lock,
+  ArrowRight,
+  ChevronRight,
+  Database,
+  Terminal,
+  Clock,
+  BookOpen
 } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
-import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const Dashboard = () => {
-  const [recentActivityRef, recentActivityVisible] = useScrollAnimation({ once: true });
-  const [quickActionsRef, quickActionsVisible] = useScrollAnimation({ once: true });
   const [stats, setStats] = useState({
     projects: 0,
     secrets: 0,
@@ -32,7 +37,6 @@ const Dashboard = () => {
 
         let secretsCount = 0;
         if (projectsRes.projects?.length > 0) {
-          // Count secrets across all projects and environments
           const secretPromises = projectsRes.projects.flatMap((project) =>
             ['dev', 'staging', 'prod'].map((env) =>
               secretAPI.list(project._id, env).catch(() => ({ secrets: [] }))
@@ -66,276 +70,209 @@ const Dashboard = () => {
       title: 'Projects',
       value: stats.projects,
       icon: FolderKanban,
-      bgColor: 'rgba(22, 71, 106, 0.1)',
-      iconColor: '#16476A',
+      color: 'text-cyan-400',
+      glow: 'shadow-cyan-500/20'
     },
     {
       title: 'Secrets',
       value: stats.secrets,
       icon: Key,
-      bgColor: 'rgba(59, 151, 151, 0.1)',
-      iconColor: '#3B9797',
+      color: 'text-purple-400',
+      glow: 'shadow-purple-500/20'
     },
     {
       title: 'Audit Logs',
       value: stats.auditLogs,
       icon: FileText,
-      bgColor: 'rgba(191, 9, 47, 0.1)',
-      iconColor: '#BF092F',
+      color: 'text-red-400',
+      glow: 'shadow-red-500/20'
     },
     {
       title: 'Status',
       value: 'Active',
       icon: Activity,
-      bgColor: 'rgba(59, 151, 151, 0.1)',
-      iconColor: '#3B9797',
+      color: 'text-emerald-400',
+      glow: 'shadow-emerald-500/20'
     },
   ];
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{borderColor: '#BF092F'}}></div>
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <div className="w-16 h-16 rounded-full border-4 border-white/5 border-t-cyan-500 animate-spin shadow-lg shadow-cyan-500/20" />
+        <p className="text-cyan-500 font-mono text-xs uppercase tracking-[0.3em] font-black animate-pulse">Syncing Protocols...</p>
       </div>
     );
   }
 
   return (
     <PageTransition>
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="fade-in">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>Dashboard</h1>
-        <p className="text-sm md:text-base" style={{color: 'var(--color-text-light)'}}>
-          Welcome to EnvSync Admin Dashboard. Manage your secrets securely.
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {statCards.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={index}
-              className={`rounded-xl shadow-md border p-6 transition-all hover:shadow-lg hover-lift fade-in-up delay-${index}00`}
-              style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium mb-1" style={{color: 'var(--color-text-light)'}}>
-                    {stat.title}
-                  </p>
-                  <p className="text-3xl font-bold" style={{color: 'var(--color-text-primary)'}}>
-                    {stat.value}
-                  </p>
-                </div>
-                <div className="p-3 rounded-lg" style={{backgroundColor: stat.bgColor}}>
-                  <Icon className="w-6 h-6" style={{color: stat.iconColor}} />
-                </div>
-              </div>
+      <div className="space-y-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,1)]" />
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40">Terminal / Mainframe</span>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Documentation Section - Placed right after stats to eliminate gap */}
-      <div className="rounded-xl shadow-md border p-6" style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-        <h2 className="text-2xl font-bold mb-6" style={{color: 'var(--color-text-primary)'}}>
-          📚 Documentation & Guide
-        </h2>
-        
-        <div className="space-y-4">
-          {/* Getting Started */}
-          <div className="rounded-lg border p-4" style={{backgroundColor: 'var(--color-bg-light)', borderColor: 'var(--color-text-light)'}}>
-            <h3 className="text-lg font-semibold mb-3" style={{color: 'var(--color-text-primary)'}}>
-              🚀 Getting Started
-            </h3>
-            <div className="space-y-2 text-sm" style={{color: 'var(--color-text-secondary)'}}>
-              <p><strong>1. Create a Project:</strong> Go to Projects and create your first project</p>
-              <p><strong>2. Add Secrets:</strong> Navigate to Secrets and add environment variables</p>
-              <p><strong>3. Install CLI:</strong> Run <code className="px-2 py-1 rounded font-mono text-xs" style={{backgroundColor: '#132440', color: '#3B9797'}}>npm install -g envsync-cli</code></p>
-              <p><strong>4. Login:</strong> Use <code className="px-2 py-1 rounded font-mono text-xs" style={{backgroundColor: '#132440', color: '#3B9797'}}>envsync login</code> to authenticate</p>
-              <p><strong>5. Run Your App:</strong> Use <code className="px-2 py-1 rounded font-mono text-xs" style={{backgroundColor: '#132440', color: '#3B9797'}}>envsync run --project ID --env dev npm start</code></p>
-            </div>
+            <h1 className="text-4xl font-black text-white tracking-tighter">Command Centre</h1>
           </div>
-
-          {/* Key Features */}
-          <div className="rounded-lg border p-4" style={{backgroundColor: 'var(--color-bg-light)', borderColor: 'var(--color-text-light)'}}>
-            <h3 className="text-lg font-semibold mb-3" style={{color: 'var(--color-text-primary)'}}>
-              ✨ Key Features
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex items-start space-x-2">
-                <span style={{color: '#3B9797'}}>✓</span>
-                <span className="text-sm" style={{color: 'var(--color-text-secondary)'}}>AES-256 Encryption</span>
-              </div>
-              <div className="flex items-start space-x-2">
-                <span style={{color: '#3B9797'}}>✓</span>
-                <span className="text-sm" style={{color: 'var(--color-text-secondary)'}}>Role-Based Access Control</span>
-              </div>
-              <div className="flex items-start space-x-2">
-                <span style={{color: '#3B9797'}}>✓</span>
-                <span className="text-sm" style={{color: 'var(--color-text-secondary)'}}>Audit Logging</span>
-              </div>
-              <div className="flex items-start space-x-2">
-                <span style={{color: '#3B9797'}}>✓</span>
-                <span className="text-sm" style={{color: 'var(--color-text-secondary)'}}>Multi-Environment Support</span>
-              </div>
-              <div className="flex items-start space-x-2">
-                <span style={{color: '#3B9797'}}>✓</span>
-                <span className="text-sm" style={{color: 'var(--color-text-secondary)'}}>CLI Integration</span>
-              </div>
-              <div className="flex items-start space-x-2">
-                <span style={{color: '#3B9797'}}>✓</span>
-                <span className="text-sm" style={{color: 'var(--color-text-secondary)'}}>Bulk Import/Export</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Security Best Practices */}
-          <div className="rounded-lg border p-4" style={{backgroundColor: 'rgba(191, 9, 47, 0.05)', borderColor: '#BF092F'}}>
-            <h3 className="text-lg font-semibold mb-3" style={{color: 'var(--color-text-primary)'}}>
-              🔒 Security Best Practices
-            </h3>
-            <ul className="space-y-2 text-sm" style={{color: 'var(--color-text-secondary)'}}>
-              <li className="flex items-start space-x-2">
-                <span style={{color: '#BF092F'}}>•</span>
-                <span>Never commit .env files to version control</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span style={{color: '#BF092F'}}>•</span>
-                <span>Use different secrets for each environment (dev, staging, prod)</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span style={{color: '#BF092F'}}>•</span>
-                <span>Rotate secrets regularly</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span style={{color: '#BF092F'}}>•</span>
-                <span>Review audit logs periodically</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span style={{color: '#BF092F'}}>•</span>
-                <span>Limit access using role-based permissions</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Quick Links */}
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Link
-              to="/app/documentation"
-              className="px-4 py-2 rounded-lg border transition-all text-sm font-medium"
-              style={{borderColor: '#3B9797', color: '#3B9797'}}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#3B9797';
-                e.currentTarget.style.color = '#FFFFFF';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#3B9797';
-              }}
-            >
-              View Full Documentation
-            </Link>
-            <Link
-              to="/app/cli-commands"
-              className="px-4 py-2 rounded-lg border transition-all text-sm font-medium"
-              style={{borderColor: '#16476A', color: '#16476A'}}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#16476A';
-                e.currentTarget.style.color = '#FFFFFF';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#16476A';
-              }}
-            >
-              CLI Commands Reference
-            </Link>
+          <div className="flex items-center space-x-2 text-white/40 text-xs font-mono">
+            <Clock className="w-4 h-4" />
+            <span>LAST_SYNC: {new Date().toLocaleTimeString()}</span>
           </div>
         </div>
-      </div>
 
-      {/* Recent Activity */}
-      {stats.recentActivity.length > 0 && (
-        <div ref={recentActivityRef} className={`rounded-xl shadow-md border p-6 ${recentActivityVisible ? 'fade-in-up' : 'opacity-0'}`} style={{backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-text-light)'}}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold" style={{color: 'var(--color-text-primary)'}}>
-              Recent Activity
-            </h2>
-            <Activity className="w-5 h-5" style={{color: 'var(--color-text-light)'}} />
-          </div>
-          <div className="space-y-3">
-            {stats.recentActivity.map((log, index) => (
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {statCards.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 rounded-lg"
-                style={{backgroundColor: 'var(--color-bg-light)'}}
+                className={`hero-glass-card p-6 group transition-all hover:translate-y-[-4px] hover:bg-white/10 ${stat.glow}`}
               >
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center gradient-accent">
-                    <Shield className="w-4 h-4 text-white" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${stat.color}`}>
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium" style={{color: 'var(--color-text-primary)'}}>
-                      {log.action}
-                    </p>
-                    <p className="text-xs" style={{color: 'var(--color-text-light)'}}>
-                      {log.environment && `${log.environment} • `}
-                      {new Date(log.createdAt).toLocaleString()}
-                    </p>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">0{index + 1}</span>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white/40 uppercase tracking-[0.2em] mb-1">{stat.title}</p>
+                  <p className="text-4xl font-black text-white tracking-tighter">{stat.value}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Main Grid: Docs & Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Documentation & Guide */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="hero-glass-card p-8 border-l-4 border-l-cyan-500">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center space-x-3">
+                  <BookOpen className="w-6 h-6 text-cyan-400" />
+                  <h2 className="text-2xl font-black text-white tracking-tight">Operation Manual</h2>
+                </div>
+                <Link to="/app/documentation" className="text-xs font-bold text-cyan-500 hover:text-cyan-400 flex items-center space-x-1 uppercase tracking-widest">
+                  <span>Full Docs</span>
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="text-sm font-black text-white/80 uppercase tracking-wider flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-purple-400" />
+                    <span>Quick Deployment</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      { s: 'Initialize Project', d: 'Create secure container in Projects' },
+                      { s: 'Define Secrets', d: 'Add sensitive variables in Secrets' },
+                      { s: 'Inject Runtime', d: 'Use CLI for zero-disk memory injection' }
+                    ].map((step, i) => (
+                      <div key={i} className="flex items-start space-x-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                        <span className="text-cyan-500 font-mono text-xs font-bold mt-0.5">{i+1}.</span>
+                        <div>
+                          <p className="text-xs font-bold text-white">{step.s}</p>
+                          <p className="text-[10px] text-white/40">{step.d}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <span className="px-2 py-1 text-xs font-medium rounded" style={{backgroundColor: 'rgba(59, 151, 151, 0.1)', color: '#3B9797'}}>
-                  {log.role}
-                </span>
+
+                <div className="space-y-4">
+                  <h3 className="text-sm font-black text-white/80 uppercase tracking-wider flex items-center space-x-2">
+                    <Lock className="w-4 h-4 text-emerald-400" />
+                    <span>Industrial Security</span>
+                  </h3>
+                  <div className="space-y-2">
+                    {['AES-256-GCM Encryption', 'Zero-Trust Architecture', 'Real-time Audit Trails', 'Memory-only Decryption'].map((f, i) => (
+                      <div key={i} className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                        <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                        <span className="text-[11px] font-bold text-white/70">{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Quick Link Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Link to="/app/projects" className="hero-glass-card p-6 flex items-center justify-between group overflow-hidden">
+                <div className="relative z-10 flex items-center space-x-4">
+                  <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                    <Database className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold">Secure Projects</h4>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest font-black">Access Vaults</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-white/20 group-hover:text-cyan-400 transition-all group-hover:translate-x-1" />
+              </Link>
+
+              <Link to="/app/cli-commands" className="hero-glass-card p-6 flex items-center justify-between group overflow-hidden">
+                <div className="relative z-10 flex items-center space-x-4">
+                  <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                    <Terminal className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold">CLI Protocols</h4>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest font-black">Command Reference</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-white/20 group-hover:text-purple-400 transition-all group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Recent Activity Feed */}
+          <div className="space-y-6">
+            <div className="hero-glass-card p-6 flex flex-col h-full">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <Activity className="w-5 h-5 text-red-400" />
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">Security Feed</h3>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              </div>
+
+              <div className="space-y-4 flex-1">
+                {stats.recentActivity.length > 0 ? (
+                  stats.recentActivity.map((log, index) => (
+                    <div
+                      key={index}
+                      className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-default"
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] font-black text-cyan-500 uppercase tracking-widest">{log.action}</span>
+                        <span className="text-[9px] text-white/20 font-mono italic">{new Date(log.createdAt).toLocaleTimeString()}</span>
+                      </div>
+                      <p className="text-xs font-bold text-white/80">{log.environment ? `Context: ${log.environment}` : 'System Protocol Execution'}</p>
+                      <div className="flex items-center space-x-2 mt-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                        <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">Entity: {log.role}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center space-y-3 opacity-30">
+                    <Shield className="w-12 h-12" />
+                    <p className="text-xs uppercase font-black tracking-widest text-white">No active feeds</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      )}
-
-      {/* Quick Actions */}
-      <div ref={quickActionsRef} className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${quickActionsVisible ? '' : 'opacity-0'}`}>
-        <div className={`rounded-xl p-6 border-2 transition-all hover:shadow-lg hover-lift ${quickActionsVisible ? 'fade-in-left' : 'opacity-0'}`} style={{background: 'linear-gradient(135deg, rgba(22, 71, 106, 0.05) 0%, rgba(22, 71, 106, 0.1) 100%)', borderColor: '#16476A'}}>
-          <h3 className="text-lg font-semibold mb-2" style={{color: '#132440'}}>
-            Getting Started
-          </h3>
-          <p className="text-sm mb-4" style={{color: '#4A5568'}}>
-            Create your first project and start managing secrets securely.
-          </p>
-          <Link
-            to="/app/projects"
-            className="inline-flex items-center font-medium text-sm transition-colors"
-            style={{color: '#16476A'}}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#132440'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#16476A'}
-          >
-            Go to Projects →
-          </Link>
-        </div>
-
-        <div className={`rounded-xl p-6 border-2 transition-all hover:shadow-lg hover-lift ${quickActionsVisible ? 'fade-in-right' : 'opacity-0'}`} style={{background: 'linear-gradient(135deg, rgba(59, 151, 151, 0.05) 0%, rgba(59, 151, 151, 0.1) 100%)', borderColor: '#3B9797'}}>
-          <h3 className="text-lg font-semibold mb-2" style={{color: '#132440'}}>
-            CLI Documentation
-          </h3>
-          <p className="text-sm mb-4" style={{color: '#4A5568'}}>
-            Learn how to use EnvSync CLI commands in your projects.
-          </p>
-          <Link
-            to="/app/cli-commands"
-            className="inline-flex items-center font-medium text-sm transition-colors"
-            style={{color: '#3B9797'}}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#16476A'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#3B9797'}
-          >
-            View CLI Commands →
-          </Link>
-        </div>
       </div>
-    </div>
     </PageTransition>
   );
 };

@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const getBaseUrl = () => {
+  const url = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+  return url.endsWith('/api') ? url : `${url}/api`;
+};
+
+const API_URL = getBaseUrl();
 
 const api = axios.create({
   baseURL: API_URL,
@@ -54,6 +59,10 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
+    return response.data;
+  },
+  register: async (email, password, role) => {
+    const response = await api.post('/auth/register', { email, password, role });
     return response.data;
   },
 };

@@ -2,14 +2,11 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Shield, AlertCircle, Moon, Sun } from 'lucide-react';
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  'https://envsync-backend.onrender.com';
+import { Shield, AlertCircle, Moon, Sun, ArrowLeft } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,6 +14,7 @@ const Register = () => {
   const [role, setRole] = useState('developer');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,32 +33,24 @@ const Register = () => {
     setLoading(true);
 
     try {
-     const response = await fetch(`${API_URL}/auth/register`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ email, password, role }),
-});
+      const result = await register(email, password, role);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'Registration failed');
+      if (!result.success) {
+        setError(result.message);
         setLoading(false);
         return;
       }
 
-      // Auto-login after registration
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      setAccessGranted(true);
       
-      // Navigate based on role
-      if (data.user.role === 'admin') {
-        navigate('/app/dashboard');
-      } else {
-        navigate('/app/cli-commands'); // Developers go to CLI commands
-      }
+      setTimeout(() => {
+        if (result.user.role === 'admin') {
+          navigate('/app/dashboard');
+        } else {
+          navigate('/app/cli-commands');
+        }
+      }, 1500);
+
     } catch (err) {
       setError('Network error. Please try again.');
       setLoading(false);
@@ -68,170 +58,129 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{background: 'linear-gradient(135deg, var(--color-dark) 0%, var(--color-secondary) 100%)'}}>
-      {/* Dark Mode Toggle - Floating */}
-      <button
-        onClick={toggleDarkMode}
-        className="fixed top-6 right-6 p-3 rounded-lg transition-all shadow-lg z-50"
-        style={{
-          backgroundColor: isDarkMode ? 'rgba(77, 179, 179, 0.2)' : 'rgba(255, 255, 255, 0.2)',
-          color: isDarkMode ? '#4DB3B3' : '#FFFFFF',
-          backdropFilter: 'blur(10px)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-        title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      >
-        {isDarkMode ? (
-          <Sun className="w-6 h-6" />
-        ) : (
-          <Moon className="w-6 h-6" />
-        )}
-      </button>
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background & Effects */}
+      <div className="homepage-bg z-0" />
+      <div className="scanline z-[2]" />
+      <div className="fixed inset-0 pointer-events-none z-[1] bg-black/40 backdrop-blur-[2px]" />
 
-      <div className="max-w-md w-full">
-        <div className="rounded-2xl shadow-2xl p-8" style={{backgroundColor: 'var(--color-bg-card)'}}>
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 gradient-primary shadow-lg">
-              <Shield className="w-8 h-8 text-white" />
+      {/* Access Status Overlay */}
+      {accessGranted && (
+        <div className="access-status access-granted">
+          IDENTITY CREATED
+        </div>
+      )}
+
+      {/* Header-like Nav */}
+      <div className="fixed top-0 left-0 w-full p-6 flex items-center justify-between z-50">
+        <Link to="/" className="flex items-center space-x-3 group">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 group-hover:bg-white/20 transition-all">
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">Back to Home</span>
+        </Link>
+        <button
+          onClick={toggleDarkMode}
+          className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all"
+        >
+          {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+        </button>
+      </div>
+
+      <div className="max-w-2xl w-full relative z-10 py-4">
+        <div className="hero-glass-card p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          {/* Logo & Title */}
+          <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-6 space-y-4 sm:space-y-0 mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-md border border-white/20 shadow-xl flex items-center justify-center flex-shrink-0 overflow-hidden p-2 relative">
+              <img 
+                src="/logo.svg" 
+                alt="EnvSync Logo" 
+                className="w-full h-full object-contain relative z-10"
+              />
             </div>
-            <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--color-text-primary)'}}>Create Account</h1>
-            <p style={{color: 'var(--color-text-light)'}}>Register for EnvSync</p>
+            <div className="text-left">
+              <h1 className="text-3xl font-black text-white tracking-tighter">Create Identity</h1>
+              <p className="text-white/50 text-sm font-medium">Join the EnvSync security protocol</p>
+            </div>
           </div>
 
           {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="border rounded-lg p-4 flex items-start space-x-3" style={{backgroundColor: 'rgba(191, 9, 47, 0.1)', borderColor: '#BF092F'}}>
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{color: '#BF092F'}} />
-                <p className="text-sm" style={{color: '#BF092F'}}>{error}</p>
+              <div className="border border-red-500/50 rounded-xl p-3 flex items-start space-x-3 bg-red-500/10 backdrop-blur-md">
+                <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-red-200 font-medium">{error}</p>
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium mb-2"
-                style={{color: 'var(--color-text-primary)'}}
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg border transition-colors"
-                style={{
-                  backgroundColor: 'var(--color-bg-light)',
-                  borderColor: 'var(--color-text-light)',
-                  color: 'var(--color-text-primary)'
-                }}
-                placeholder="your@email.com"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] ml-1">Protocol Identifier</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 focus:bg-white/10 transition-all outline-none placeholder:text-white/20 text-sm"
+                  placeholder="your@email.com"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] ml-1">Entity Role</label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 focus:bg-white/10 transition-all outline-none appearance-none text-sm"
+                >
+                  <option value="developer" className="bg-gray-900">Developer Entity</option>
+                  <option value="admin" className="bg-gray-900">Admin Authority</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] ml-1">Security Key</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 focus:bg-white/10 transition-all outline-none placeholder:text-white/20 text-sm"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] ml-1">Confirm Identity Key</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 focus:bg-white/10 transition-all outline-none placeholder:text-white/20 text-sm"
+                  placeholder="••••••••"
+                />
+              </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="role"
-                className="block text-sm font-medium mb-2"
-                style={{color: 'var(--color-text-primary)'}}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-purple w-full py-4 text-base font-bold tracking-widest uppercase shadow-lg shadow-purple-500/20"
               >
-                Role
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border transition-colors"
-                style={{
-                  backgroundColor: 'var(--color-bg-light)',
-                  borderColor: 'var(--color-text-light)',
-                  color: 'var(--color-text-primary)'
-                }}
-              >
-                <option value="developer">Developer</option>
-                <option value="admin">Admin</option>
-              </select>
+                {loading ? 'Processing...' : 'Register Identity'}
+              </button>
             </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium mb-2"
-                style={{color: 'var(--color-text-primary)'}}
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg border transition-colors"
-                style={{
-                  backgroundColor: 'var(--color-bg-light)',
-                  borderColor: 'var(--color-text-light)',
-                  color: 'var(--color-text-primary)'
-                }}
-                placeholder="••••••••"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium mb-2"
-                style={{color: 'var(--color-text-primary)'}}
-              >
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg border transition-colors"
-                style={{
-                  backgroundColor: 'var(--color-bg-light)',
-                  borderColor: 'var(--color-text-light)',
-                  color: 'var(--color-text-primary)'
-                }}
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-lg font-medium text-white transition-all gradient-primary"
-              style={{
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer'
-              }}
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
 
             <div className="text-center">
-              <p style={{color: 'var(--color-text-light)'}}>
-                Already have an account?{' '}
+              <p className="text-white/30 text-xs font-medium">
+                Already part of the protocol?{' '}
                 <Link 
                   to="/login" 
-                  className="font-medium transition-colors"
-                  style={{color: '#3B9797'}}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#4DB3B3'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#3B9797'}
+                  className="text-purple-400 hover:text-purple-300 font-bold underline underline-offset-4 ml-1"
                 >
-                  Sign In
+                  Authenticate
                 </Link>
               </p>
             </div>
