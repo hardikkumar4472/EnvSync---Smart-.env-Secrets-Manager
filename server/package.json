@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@getbrevo/brevo": "^5.0.1",
     "@hardik010190/envsync": "^1.0.1",
+    "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -11,6 +13,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.1",
     "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.3",
     "socket.io": "^4.8.3"
   }
 }

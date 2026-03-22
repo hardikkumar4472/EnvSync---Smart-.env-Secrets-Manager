@@ -45,9 +45,22 @@ exports.createProject = async (req, res) => {
  */
 exports.listProjects = async (req, res) => {
   try {
-    // Only return projects created by the current user
+    // Return projects created by the current user OR assigned to them
+    const query = { isActive: true };
+    if (req.user.role !== 'admin') {
+      query.$or = [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects } }
+      ];
+    } else {
+      // If admin, they might want to see all projects they created
+      // or we can allow them to see all projects in the system
+      // For now, let's keep it to projects they created as per original logic
+      query.createdBy = req.user.id;
+    }
+
     const projects = await Project.find(
-      { isActive: true, createdBy: req.user.id },
+      query,
       { name: 1, description: 1, createdAt: 1, updatedAt: 1, _id: 1 }
     ).sort({ createdAt: -1 });
 
@@ -68,12 +81,18 @@ exports.getProject = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    // Only return project if it belongs to the current user
-    const project = await Project.findOne({ 
-      _id: projectId, 
-      isActive: true, 
-      createdBy: req.user.id 
-    });
+    // Return project if it belongs to the current user OR is assigned to them
+    const query = { _id: projectId, isActive: true };
+    if (req.user.role !== 'admin') {
+      query.$or = [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects } }
+      ];
+    } else {
+      query.createdBy = req.user.id;
+    }
+
+    const project = await Project.findOne(query);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });

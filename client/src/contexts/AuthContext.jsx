@@ -33,18 +33,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authAPI.login(email, password);
       
-      // Only allow admin users
-      if (data.user?.role !== 'admin') {
-        return {
-          success: false,
-          message: 'Access denied. Admin access required.',
-        };
-      }
-      
+      // Store user and token
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
-      return { success: true };
+      return { success: true, user: data.user };
     } catch (error) {
       return {
         success: false,

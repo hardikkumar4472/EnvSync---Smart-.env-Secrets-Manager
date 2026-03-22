@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { projectAPI } from '../services/api';
 import { Plus, FolderKanban, Trash2, Calendar, Edit2, X, Shield, Database, ChevronRight, Copy } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import PageTransition from '../components/PageTransition';
 
 const Projects = () => {
+  const { isAdmin } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -108,13 +110,15 @@ const Projects = () => {
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tighter">Secure Projects</h1>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="btn-purple px-6 sm:px-8 py-3 sm:py-4 flex items-center justify-center space-x-3 shadow-lg shadow-purple-500/20 w-full sm:w-auto"
-          >
-            <Plus className="w-5 h-5" />
-            <span className="font-bold tracking-tight text-sm sm:text-base">Initialize Vault</span>
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="btn-purple px-6 sm:px-8 py-3 sm:py-4 flex items-center justify-center space-x-3 shadow-lg shadow-purple-500/20 w-full sm:w-auto"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="font-bold tracking-tight text-sm sm:text-base">Initialize Vault</span>
+            </button>
+          )}
         </div>
 
         {/* Status Messaging */}
@@ -133,17 +137,19 @@ const Projects = () => {
             </div>
             <h3 className="text-xl font-bold text-white mb-2">No Projects Detected</h3>
             <p className="text-white/40 max-w-sm mx-auto mb-8 text-sm">
-              Your security vault is empty. Initialize a new project container to begin managing application secrets.
+              Your security vault is empty. {isAdmin ? 'Initialize a new project container to begin managing application secrets.' : 'Please wait for an administrator to assign a vault to your entity.'}
             </p>
-            <button
-               onClick={() => setShowModal(true)}
-               className="btn-glass px-8 py-3 text-cyan-400 group"
-            >
-              <div className="flex items-center space-x-2">
-                <span>Start Initialization</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setShowModal(true)}
+                className="btn-glass px-8 py-3 text-cyan-400 group"
+              >
+                <div className="flex items-center space-x-2">
+                  <span>Start Initialization</span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -157,23 +163,27 @@ const Projects = () => {
                     <FolderKanban className="w-7 h-7 text-cyan-400" />
                   </div>
                   <div className="flex items-center space-x-1 opacity-20 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleEdit(project)}
-                      className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
-                      title="Edit Protocol"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedProject(project);
-                        setShowDeleteModal(true);
-                      }}
-                      className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
-                      title="Terminate Vault"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {isAdmin && (
+                      <>
+                        <button
+                          onClick={() => handleEdit(project)}
+                          className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+                          title="Edit Protocol"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedProject(project);
+                            setShowDeleteModal(true);
+                          }}
+                          className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+                          title="Terminate Vault"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
 

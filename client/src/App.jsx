@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Secrets from './pages/Secrets';
 import AuditLogs from './pages/AuditLogs';
+import Users from './pages/Users';
 import CLICommands from './pages/CLICommands';
 import Documentation from './pages/Documentation';
 
@@ -86,9 +87,10 @@ function App() {
       >
         {/* Admin-only routes */}
         <Route path="dashboard" element={<AdminOnlyRoute><Dashboard /></AdminOnlyRoute>} />
-        <Route path="projects" element={<AdminOnlyRoute><Projects /></AdminOnlyRoute>} />
-        <Route path="secrets" element={<AdminOnlyRoute><Secrets /></AdminOnlyRoute>} />
+        <Route path="projects" element={<Projects />} />
+        <Route path="secrets" element={<Secrets />} />
         <Route path="audit-logs" element={<AdminOnlyRoute><AuditLogs /></AdminOnlyRoute>} />
+        <Route path="users" element={<AdminOnlyRoute><Users /></AdminOnlyRoute>} />
         
         {/* Available to all authenticated users */}
         <Route path="cli-commands" element={<CLICommands />} />

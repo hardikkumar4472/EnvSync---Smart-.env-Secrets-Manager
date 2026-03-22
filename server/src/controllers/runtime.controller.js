@@ -17,11 +17,14 @@ exports.getRuntimeSecrets = async (req, res) => {
         .json({ message: "projectId and environment are required" });
     }
 
-    // Verify project belongs to the current user
+    // Verify project access
     const project = await Project.findOne({ 
       _id: projectId, 
-      isActive: true, 
-      createdBy: req.user.id 
+      isActive: true,
+      $or: [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects || [] } }
+      ]
     });
 
     if (!project) {

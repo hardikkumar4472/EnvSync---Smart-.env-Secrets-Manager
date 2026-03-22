@@ -26,6 +26,10 @@ const auditLogSchema = new mongoose.Schema(
         "PROJECT_UPDATE",
         "PROJECT_DELETE",
         "PROJECT_PERMANENT_DELETE",
+        "PROJECT_ASSIGN",
+        "PROJECT_UNASSIGN",
+        "REGISTER",
+        "USER_DELETE",
       ],
     },
     projectId: {

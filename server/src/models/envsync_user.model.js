@@ -23,6 +23,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    assignedProjects: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Project",
+      },
+    ],
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "envsync_user",
+    },
   },
   { timestamps: true }
 );

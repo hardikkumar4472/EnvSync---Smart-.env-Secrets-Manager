@@ -11,9 +11,9 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Email, password, and role are required" });
     }
 
-    // Validate role
-    if (!['admin', 'developer'].includes(role)) {
-      return res.status(400).json({ message: "Role must be either 'admin' or 'developer'" });
+    // Validate role - Only admin can be created through public registration
+    if (role !== 'admin') {
+      return res.status(403).json({ message: "Only admin accounts can be created through public registration. Developer accounts must be created by an administrator." });
     }
 
     // Check if user already exists
@@ -59,6 +59,52 @@ exports.register = async (req, res) => {
   }
 };
 
+const { sendWelcomeEmail } = require("../utils/email");
+
+exports.adminCreateUser = async (req, res) => {
+  try {
+    const { email, password, role } = req.body;
+
+    if (!email || !password || !role) {
+      return res.status(400).json({ message: "Email, password, and role are required" });
+    }
+
+    if (!['developer', 'viewer'].includes(role)) {
+      return res.status(400).json({ message: "Admin can only create 'developer' or 'viewer' accounts." });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists with this email" });
+    }
+
+    const user = new User({
+      email,
+      password,
+      role,
+      isActive: true,
+      createdBy: req.user.id
+    });
+
+    await user.save();
+
+    // Send email with credentials
+    const emailSent = await sendWelcomeEmail(email, password);
+
+    res.status(201).json({
+      message: "User created successfully" + (emailSent ? " and welcome email sent." : " but failed to send welcome email."),
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Admin user creation error:", error);
+    res.status(500).json({ message: "Error creating user" });
+  }
+};
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
@@ -83,6 +129,7 @@ exports.login = async (req, res) => {
       id: user._id,
       email: user.email,
       role: user.role,
+      assignedProjects: user.assignedProjects || [],
     },
   });
 };

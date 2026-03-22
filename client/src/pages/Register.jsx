@@ -11,7 +11,7 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('developer');
+  const [role, setRole] = useState('admin');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [accessGranted, setAccessGranted] = useState(false);
@@ -131,10 +131,10 @@ const Register = () => {
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 focus:bg-white/10 transition-all outline-none appearance-none text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-purple-500/50 focus:bg-white/10 transition-all outline-none appearance-none text-sm pointer-events-none opacity-60"
+                  disabled
                 >
-                  <option value="developer" className="bg-gray-900">Developer Entity</option>
-                  <option value="admin" className="bg-gray-900">Admin Authority</option>
+                  <option value="admin" className="bg-gray-900">Admin Authority (Default)</option>
                 </select>
               </div>
 

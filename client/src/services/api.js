@@ -65,6 +65,29 @@ export const authAPI = {
     const response = await api.post('/auth/register', { email, password, role });
     return response.data;
   },
+  adminCreateUser: async (email, password, role) => {
+    const response = await api.post('/auth/admin-create-user', { email, password, role });
+    return response.data;
+  },
+};
+
+export const adminAPI = {
+  listUsers: async () => {
+    const response = await api.get('/admin/users');
+    return response.data;
+  },
+  assignProject: async (userId, projectId) => {
+    const response = await api.post('/admin/assign-project', { userId, projectId });
+    return response.data;
+  },
+  unassignProject: async (userId, projectId) => {
+    const response = await api.post('/admin/unassign-project', { userId, projectId });
+    return response.data;
+  },
+  deleteUser: async (userId) => {
+    const response = await api.delete(`/admin/users/${userId}`);
+    return response.data;
+  },
 };
 
 export const projectAPI = {

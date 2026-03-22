@@ -14,11 +14,14 @@ exports.createSecret = async (req, res) => {
       return res.status(400).json({ message: "All fields required" });
     }
 
-    // Verify project belongs to the current user
+    // Verify project access
     const project = await Project.findOne({ 
       _id: projectId, 
-      isActive: true, 
-      createdBy: req.user.id 
+      isActive: true,
+      $or: [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects || [] } }
+      ]
     });
 
     if (!project) {
@@ -73,11 +76,14 @@ exports.listSecrets = async (req, res) => {
         .json({ message: "projectId and environment are required" });
     }
 
-    // Verify project belongs to the current user
+    // Verify project access
     const project = await Project.findOne({ 
       _id: projectId, 
-      isActive: true, 
-      createdBy: req.user.id 
+      isActive: true,
+      $or: [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects || [] } }
+      ]
     });
 
     if (!project) {
@@ -121,11 +127,14 @@ exports.getSecretValue = async (req, res) => {
     return res.status(404).json({ message: "Secret not found" });
   }
 
-  // Verify project belongs to the current user
+  // Verify project access
   const project = await Project.findOne({ 
     _id: secret.projectId, 
-    isActive: true, 
-    createdBy: req.user.id 
+    isActive: true,
+    $or: [
+      { createdBy: req.user.id },
+      { _id: { $in: req.user.assignedProjects || [] } }
+    ]
   });
 
   if (!project) {
@@ -171,12 +180,14 @@ exports.updateSecret = async (req, res) => {
       return res.status(404).json({ message: "Secret not found" });
     }
 
-    // Verify project belongs to the current user
-    const Project = require("../models/project.model");
+    // Verify project access
     const project = await Project.findOne({ 
       _id: secret.projectId, 
-      isActive: true, 
-      createdBy: req.user.id 
+      isActive: true,
+      $or: [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects || [] } }
+      ]
     });
 
     if (!project) {
@@ -240,12 +251,14 @@ exports.deleteSecret = async (req, res) => {
       return res.status(404).json({ message: "Secret not found" });
     }
 
-    // Verify project belongs to the current user
-    const Project = require("../models/project.model");
+    // Verify project access
     const project = await Project.findOne({ 
       _id: secret.projectId, 
-      isActive: true, 
-      createdBy: req.user.id 
+      isActive: true,
+      $or: [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects || [] } }
+      ]
     });
 
     if (!project) {
@@ -291,12 +304,14 @@ exports.bulkDeleteSecrets = async (req, res) => {
       });
     }
 
-    // Verify project belongs to the current user
-    const Project = require("../models/project.model");
+    // Verify project access
     const project = await Project.findOne({ 
       _id: projectId, 
-      isActive: true, 
-      createdBy: req.user.id 
+      isActive: true,
+      $or: [
+        { createdBy: req.user.id },
+        { _id: { $in: req.user.assignedProjects || [] } }
+      ]
     });
 
     if (!project) {

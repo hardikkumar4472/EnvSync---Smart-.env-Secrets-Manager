@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Terminal,
   Copy,
@@ -10,13 +10,34 @@ import {
   Zap,
   Shield,
   Code,
-  ArrowRight
+  ArrowRight,
+  Database,
+  ExternalLink
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { projectAPI } from '../services/api';
 import PageTransition from '../components/PageTransition';
 
 const CLICommands = () => {
+  const { user } = useAuth();
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const [expandedCommand, setExpandedCommand] = useState(null);
   const [copiedText, setCopiedText] = useState('');
+
+  useEffect(() => {
+    const fetchMyProjects = async () => {
+      try {
+        const res = await projectAPI.list();
+        setProjects(res.projects || []);
+      } catch (err) {
+        console.error("Error loading assigned projects:", err);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+    fetchMyProjects();
+  }, []);
 
   const copyToClipboard = (text, id) => {
     navigator.clipboard.writeText(text);
@@ -34,7 +55,7 @@ const CLICommands = () => {
       examples: [
         {
           command: 'envsync --version',
-          output: '1.0.0',
+          output: '2.0.0',
         },
       ],
       useCases: [
@@ -251,9 +272,56 @@ Password: ******
           </div>
           <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
             <Code className="w-4 h-4 text-purple-400" />
-            <span className="text-[10px] uppercase font-black tracking-widest text-white/60 font-mono">ENVSYNC_V1.0.0</span>
+            <span className="text-[10px] uppercase font-black tracking-widest text-white/60 font-mono">ENVSYNC_V2.0.0</span>
           </div>
         </div>
+
+        {/* Assigned Projects Quick-Start */}
+        {projects.length > 0 && (
+          <div className="space-y-6">
+            <div className="flex items-center space-x-4">
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <h2 className="text-[10px] uppercase font-black tracking-[0.4em] text-cyan-500 whitespace-nowrap">Your Authorized Vaults</h2>
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {projects.map((project) => (
+                <div key={project._id} className="hero-glass-card p-6 border-l-2 border-l-cyan-500/50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                        <Database className="w-5 h-5 text-cyan-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold">{project.name}</h3>
+                        <p className="text-[10px] font-mono text-white/20 uppercase tracking-widest font-black">ID: {project._id}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <p className="text-[9px] font-black text-white/30 uppercase tracking-tighter">Copy Execution Command:</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['dev', 'staging', 'prod'].map((env) => (
+                        <button
+                          key={env}
+                          onClick={() => copyToClipboard(`envsync run --project ${project._id} --env ${env} npm start`, `vault-${project._id}-${env}`)}
+                          className="p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-center group/btn relative overflow-hidden"
+                        >
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${copiedText === `vault-${project._id}-${env}` ? 'text-emerald-400' : 'text-white/60 group-hover/btn:text-cyan-400'}`}>
+                            {copiedText === `vault-${project._id}-${env}` ? 'Copied' : env}
+                          </span>
+                          <div className={`absolute bottom-0 left-0 h-[1px] bg-cyan-500 transition-all duration-300 ${copiedText === `vault-${project._id}-${env}` ? 'w-full' : 'w-0 group-hover/btn:w-full'}`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Commands List */}
         <div className="space-y-4">

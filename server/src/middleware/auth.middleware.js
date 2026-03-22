@@ -1,6 +1,6 @@
 const { verifyToken } = require("../config/jwt");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -17,7 +17,15 @@ module.exports = (req, res, next) => {
       if (!decoded || !decoded.id) {
         return res.status(401).json({ message: "Invalid token payload" });
       }
-      req.user = decoded;
+      
+      const User = require("../models/envsync_user.model");
+      const user = await User.findById(decoded.id).select("-password");
+      
+      if (!user || !user.isActive) {
+        return res.status(401).json({ message: "User not found or inactive" });
+      }
+
+      req.user = user;
       next();
     } catch (err) {
       // Log error for debugging (but don't expose details to client)

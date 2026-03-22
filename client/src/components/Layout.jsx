@@ -14,8 +14,9 @@ import {
   Shield,
   Moon,
   Sun,
-  User as UserIcon,
-  ChevronDown
+  ChevronDown,
+  Users,
+  User as UserIcon
 } from 'lucide-react';
 
 const Layout = () => {
@@ -33,12 +34,13 @@ const Layout = () => {
   };
 
   const navItems = [
-    { path: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
-    { path: '/app/secrets', icon: Key, label: 'Secrets' },
-    { path: '/app/audit-logs', icon: FileText, label: 'Audit Logs' },
-    { path: '/app/cli-commands', icon: Terminal, label: 'CLI' },
-  ];
+    { path: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard', adminOnly: true },
+    { path: '/app/projects', icon: FolderKanban, label: 'Projects', adminOnly: true },
+    { path: '/app/secrets', icon: Key, label: 'Secrets', adminOnly: true },
+    { path: '/app/users', icon: Users, label: 'Users', adminOnly: true },
+    { path: '/app/audit-logs', icon: FileText, label: 'Audit Logs', adminOnly: true },
+    { path: '/app/cli-commands', icon: Terminal, label: 'CLI', adminOnly: false },
+  ].filter(item => !item.adminOnly || user?.role === 'admin');
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
