@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 require("dotenv").config();
 const { Command } = require("commander");
+const { version } = require("../package.json");
 const program = new Command();
 
 program
   .name("envsync")
   .description("Runtime-only secret injection CLI")
-  .version("2.0.0")
+  .version(version)
   .enablePositionalOptions();
 
 program.command("login").description("Login to EnvSync").action(
