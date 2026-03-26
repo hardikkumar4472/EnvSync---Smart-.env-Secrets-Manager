@@ -10,15 +10,21 @@ module.exports = async () => {
 
   const ask = (q) => new Promise((res) => readline.question(q, res));
 
-  const email = await ask("Email: ");
-  const password = await ask("Password: ");
+  const email = (await ask("Email: ")).trim();
+  const password = (await ask("Password: ")).trim();
   readline.close();
 
   try {
     const res = await api.post("/auth/login", { email, password });
-    saveToken(res.data.token);
-    console.log(chalk.green("Logged in successfully"));
-  } catch {
-    console.log(chalk.red("Login failed"));
+    try {
+      saveToken(res.data.token);
+      console.log(chalk.green("Logged in successfully"));
+    } catch (tokenError) {
+      console.log(chalk.yellow("Login successful, but failed to save session token locally."));
+      console.log(chalk.red(`Folder Permission Error: ${tokenError.message}`));
+    }
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    console.log(chalk.red(`Login failed: ${message}`));
   }
 };
