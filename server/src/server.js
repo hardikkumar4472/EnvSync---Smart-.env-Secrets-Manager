@@ -36,7 +36,7 @@ mongoose
 const shutdown = () => {
   console.log('\n⚠ Shutting down gracefully...');
   cleanupService.stopScheduledCleanup();
-  mongoose.connection.close(() => {
+  mongoose.connection.close().then(() => {
     console.log('✓ MongoDB connection closed');
     process.exit(0);
   });
