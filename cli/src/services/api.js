@@ -2,7 +2,7 @@ const axios = require("axios");
 const { getToken } = require("./token.store");
 
 const api = axios.create({
-  baseURL: process.env.ENVSYNC_API_URL || "http://localhost:4000/api" || "https://envsync-backend.onrender.com/api",
+  baseURL: process.env.ENVSYNC_API_URL || "https://envsync-backend.onrender.com/api",
 });
 
 api.interceptors.request.use((config) => {
