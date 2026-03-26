@@ -10,27 +10,23 @@ export const useTheme = () => {
   return context;
 };
 
+/**
+ * Hardcoded Dark Theme Provider
+ * All other themes have been deprecated for maximum security aesthetics.
+ */
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage for saved preference
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
-  });
+  // Always default to dark for all users
+  const [isDarkMode] = useState(true);
 
   useEffect(() => {
-    // Save preference to localStorage
-    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
-    
-    // Apply dark mode class to document
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+    // Force dark mode class on the document
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('darkMode', 'true');
+  }, []);
 
+  // No-op toggle to prevent UI errors if called
   const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
+    console.log("Manual override detected: Theme is locked by policy.");
   };
 
   return (

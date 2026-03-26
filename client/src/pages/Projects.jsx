@@ -106,9 +106,9 @@ const Projects = () => {
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,1)]" />
-              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40">Vault / Storage</span>
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-[var(--color-text-light)] opacity-60">Vault / Storage</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tighter">Secure Projects</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-[var(--color-text-primary)] tracking-tighter">Secure Projects</h1>
           </div>
           {isAdmin && (
             <button
@@ -188,7 +188,7 @@ const Projects = () => {
                 </div>
 
                 <div className="space-y-1 mb-6">
-                  <h3 className="text-xl font-black text-white group-hover:text-cyan-400 transition-colors">{project.name}</h3>
+                  <h3 className="text-xl font-black text-[var(--color-text-primary)] group-hover:text-cyan-400 transition-colors">{project.name}</h3>
                   <div 
                     onClick={() => {
                       navigator.clipboard.writeText(project._id);
@@ -196,9 +196,9 @@ const Projects = () => {
                     }}
                     className="flex items-center space-x-2 cursor-pointer group/id"
                   >
-                    <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest font-black group-hover/id:text-white/60">VAULT_ID:</span>
-                    <span className="text-[10px] font-mono text-white/20 truncate">{project._id}</span>
-                    <Copy className="w-3 h-3 text-white/10 group-hover/id:text-cyan-400" />
+                    <span className="text-[10px] font-mono text-[var(--color-text-light)] opacity-40 uppercase tracking-widest font-black group-hover/id:opacity-80">VAULT_ID:</span>
+                    <span className="text-[10px] font-mono text-[var(--color-text-light)] opacity-30 truncate">{project._id}</span>
+                    <Copy className="w-3 h-3 text-[var(--color-text-light)] opacity-20 group-hover/id:text-cyan-400 group-hover/id:opacity-100" />
                   </div>
                 </div>
 
@@ -209,7 +209,7 @@ const Projects = () => {
                 )}
 
                 <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                  <div className="flex items-center space-x-2 text-white/30">
+                  <div className="flex items-center space-x-2 text-[var(--color-text-light)] opacity-40">
                     <Calendar className="w-4 h-4" />
                     <span className="text-[10px] font-black uppercase tracking-widest">
                       {new Date(project.createdAt).toLocaleDateString()}

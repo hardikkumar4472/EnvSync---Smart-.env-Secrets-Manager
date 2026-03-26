@@ -113,11 +113,11 @@ const Dashboard = () => {
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,1)]" />
-              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40">Terminal / Mainframe</span>
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-[var(--color-text-light)] opacity-60">Terminal / Mainframe</span>
             </div>
-            <h1 className="text-4xl font-black text-white tracking-tighter">Command Centre</h1>
+            <h1 className="text-4xl font-black text-[var(--color-text-primary)] tracking-tighter">Command Centre</h1>
           </div>
-          <div className="flex items-center space-x-2 text-white/40 text-xs font-mono">
+          <div className="flex items-center space-x-2 text-[var(--color-text-light)] opacity-40 text-xs font-mono">
             <Clock className="w-4 h-4" />
             <span>LAST_SYNC: {new Date().toLocaleTimeString()}</span>
           </div>
@@ -136,11 +136,11 @@ const Dashboard = () => {
                   <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${stat.color}`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">0{index + 1}</span>
+                  <span className="text-[10px] font-black text-[var(--color-text-light)] opacity-20 uppercase tracking-widest">0{index + 1}</span>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white/40 uppercase tracking-[0.2em] mb-1">{stat.title}</p>
-                  <p className="text-4xl font-black text-white tracking-tighter">{stat.value}</p>
+                  <p className="text-xs font-bold text-[var(--color-text-light)] opacity-60 uppercase tracking-[0.2em] mb-1">{stat.title}</p>
+                  <p className="text-4xl font-black text-[var(--color-text-primary)] tracking-tighter">{stat.value}</p>
                 </div>
               </div>
             );
@@ -155,7 +155,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-3">
                   <BookOpen className="w-6 h-6 text-cyan-400" />
-                  <h2 className="text-2xl font-black text-white tracking-tight">Operation Manual</h2>
+                  <h2 className="text-2xl font-black text-[var(--color-text-primary)] tracking-tight">Operation Manual</h2>
                 </div>
                 <Link to="/app/documentation" className="text-xs font-bold text-cyan-500 hover:text-cyan-400 flex items-center space-x-1 uppercase tracking-widest">
                   <span>Full Docs</span>
@@ -178,8 +178,8 @@ const Dashboard = () => {
                       <div key={i} className="flex items-start space-x-3 p-3 rounded-xl bg-white/5 border border-white/5">
                         <span className="text-cyan-500 font-mono text-xs font-bold mt-0.5">{i+1}.</span>
                         <div>
-                          <p className="text-xs font-bold text-white">{step.s}</p>
-                          <p className="text-[10px] text-white/40">{step.d}</p>
+                          <p className="text-xs font-bold text-[var(--color-text-primary)]">{step.s}</p>
+                          <p className="text-[10px] text-[var(--color-text-light)] opacity-60">{step.d}</p>
                         </div>
                       </div>
                     ))}
@@ -211,11 +211,11 @@ const Dashboard = () => {
                     <Database className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="text-white font-bold">Secure Projects</h4>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest font-black">Access Vaults</p>
+                    <h4 className="text-[var(--color-text-primary)] font-bold">Secure Projects</h4>
+                    <p className="text-[10px] text-[var(--color-text-light)] opacity-60 uppercase tracking-widest font-black">Access Vaults</p>
                   </div>
                 </div>
-                <ArrowRight className="w-5 h-5 text-white/20 group-hover:text-cyan-400 transition-all group-hover:translate-x-1" />
+                <ArrowRight className="w-5 h-5 text-[var(--color-text-light)] opacity-20 group-hover:text-cyan-400 transition-all group-hover:translate-x-1" />
               </Link>
 
               <Link to="/app/cli-commands" className="hero-glass-card p-6 flex items-center justify-between group overflow-hidden">
@@ -239,7 +239,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
                   <Activity className="w-5 h-5 text-red-400" />
-                  <h3 className="text-lg font-black text-white uppercase tracking-tight">Security Feed</h3>
+                  <h3 className="text-lg font-black text-[var(--color-text-primary)] uppercase tracking-tight">Security Feed</h3>
                 </div>
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
               </div>

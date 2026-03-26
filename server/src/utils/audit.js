@@ -6,6 +6,7 @@ exports.logAudit = async ({
   projectId,
   environment,
   ipAddress,
+  details,
 }) => {
   try {
     await AuditLog.create({
@@ -15,6 +16,7 @@ exports.logAudit = async ({
       projectId,
       environment,
       ipAddress,
+      details,
     });
   } catch (err) {
     console.error("Audit log failed:", err.message);

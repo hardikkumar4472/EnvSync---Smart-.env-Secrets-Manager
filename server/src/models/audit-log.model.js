@@ -4,7 +4,7 @@ const auditLogSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "envsync_user",
       required: true,
     },
     role: {
@@ -30,7 +30,11 @@ const auditLogSchema = new mongoose.Schema(
         "PROJECT_UNASSIGN",
         "REGISTER",
         "USER_DELETE",
+        "SECRET_LEAK_PREVENTED", 
       ],
+    },
+    details: {
+      type: String, 
     },
     projectId: {
       type: mongoose.Schema.Types.ObjectId,

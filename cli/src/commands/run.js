@@ -20,12 +20,18 @@ module.exports = async (cmd, options) => {
     const secretKeys = Object.keys(res.data);
     const secretValues = Object.values(res.data);
     
+    const { getToken } = require("../services/token.store");
+    
     // Add secret keys and values to env for protection loader
     const env = { 
       ...process.env, 
       ...res.data,
       ENVSYNC_SECRET_KEYS: JSON.stringify(secretKeys),
-      ENVSYNC_SECRET_VALUES: JSON.stringify(secretValues)
+      ENVSYNC_SECRET_VALUES: JSON.stringify(secretValues),
+      ENVSYNC_API_TOKEN: getToken(),
+      ENVSYNC_PROJECT_ID: options.project,
+      ENVSYNC_ENVIRONMENT: options.env,
+      ENVSYNC_BASE_URL: process.env.ENVSYNC_API_URL || "https://envsync-backend.onrender.com/api"
     };
 
     // Inform user about injected secrets (keys only, not values)

@@ -94,12 +94,7 @@ const Layout = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 sm:p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all hover:bg-white/10"
-              >
-                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
+              {/* Removed theme toggle for locked dark theme */}
 
               {/* User Dropdown Container */}
               <div className="relative">
@@ -199,13 +194,7 @@ const Layout = () => {
                 })}
                 
                 <div className="pt-4 mt-4 border-t border-white/5 space-y-2">
-                   <button
-                    onClick={() => { setMobileMenuOpen(false); toggleDarkMode(); }}
-                    className="flex items-center space-x-4 w-full px-5 py-4 rounded-xl text-white/40 hover:bg-white/5 transition-all text-sm font-black uppercase tracking-widest"
-                  >
-                    {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
-                    <span>{isDarkMode ? 'Atmospheric Mode' : 'Low Light Mode'}</span>
-                  </button>
+              {/* Removed theme toggle for locked dark theme */}
                   <button
                     onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
                     className="flex items-center space-x-4 w-full px-5 py-4 rounded-xl text-red-500/60 hover:bg-red-500/10 transition-all text-sm font-black uppercase tracking-widest"

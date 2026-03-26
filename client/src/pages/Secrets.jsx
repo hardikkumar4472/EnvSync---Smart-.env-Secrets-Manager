@@ -273,9 +273,9 @@ const Secrets = () => {
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,1)]" />
-              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40">Secrets / Repository</span>
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-[var(--color-text-light)] opacity-70">Secrets / Repository</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tighter">Identity Secrets</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-[var(--color-text-primary)] tracking-tighter">Identity Secrets</h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {isAdmin && (
@@ -303,14 +303,14 @@ const Secrets = () => {
         <div className="hero-glass-card p-6 border-white/10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1 flex items-center space-x-2">
+              <label className="text-[10px] font-black text-[var(--color-text-light)] opacity-50 uppercase tracking-[0.2em] ml-1 flex items-center space-x-2">
                 <Database className="w-3 h-3" />
                 <span>Target Project Container</span>
               </label>
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-cyan-500/50 focus:bg-white/10 transition-all outline-none appearance-none cursor-pointer"
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-[var(--color-text-primary)] focus:border-cyan-500/50 focus:bg-white/10 transition-all outline-none appearance-none cursor-pointer"
               >
                 <option value="" disabled className="bg-gray-900">Select Project Vault</option>
                 {projects.map((project) => (
@@ -322,19 +322,19 @@ const Secrets = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1 flex items-center space-x-2">
+              <label className="text-[10px] font-black text-[var(--color-text-light)] opacity-50 uppercase tracking-[0.2em] ml-1 flex items-center space-x-2">
                 <Terminal className="w-3 h-3" />
                 <span>Deployment Environment</span>
               </label>
-              <div className="flex p-1.5 rounded-xl bg-black/40 border border-white/5">
+              <div className="flex p-1.5 rounded-xl bg-black/10 border border-white/5">
                 {environments.map((env) => (
                   <button
                     key={env}
                     onClick={() => setSelectedEnv(env)}
                     className={`flex-1 py-3 px-2 sm:px-4 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
                       selectedEnv === env 
-                      ? 'bg-white/10 text-white shadow-lg' 
-                      : 'text-white/30 hover:text-white/60'
+                      ? 'bg-white/20 text-[var(--color-text-primary)] shadow-lg' 
+                      : 'text-[var(--color-text-light)] opacity-50 hover:opacity-100'
                     }`}
                   >
                     {env}
@@ -383,10 +383,10 @@ const Secrets = () => {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-white/5 border-b border-white/10">
-                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Identifier Key</th>
-                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Auth Method</th>
-                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Created At</th>
-                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-white/40 text-right">Operations</th>
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-[var(--color-text-light)] opacity-60">Identifier Key</th>
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-[var(--color-text-light)] opacity-60">Auth Method</th>
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-[var(--color-text-light)] opacity-60">Created At</th>
+                      <th className="px-8 py-5 text-[10px] uppercase font-black tracking-[0.2em] text-[var(--color-text-light)] opacity-60 text-right">Operations</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
@@ -397,14 +397,14 @@ const Secrets = () => {
                             <div className="p-2 rounded-lg bg-white/5 text-purple-400 group-hover:bg-purple-500/10 group-hover:text-purple-300 transition-all">
                                <Key className="w-4 h-4" />
                             </div>
-                            <code className="text-sm font-black text-white group-hover:text-purple-400 transition-colors uppercase tracking-tight">{secret.key}</code>
+                            <code className="text-sm font-black text-[var(--color-text-primary)] group-hover:text-purple-400 transition-colors uppercase tracking-tight">{secret.key}</code>
                           </div>
                         </td>
                         <td className="px-8 py-6">
                            <span className="px-3 py-1 rounded-lg border border-cyan-500/20 bg-cyan-500/5 text-[9px] font-black uppercase tracking-widest text-cyan-400">ENCRYPTED_MEMORY</span>
                         </td>
                         <td className="px-8 py-6">
-                          <div className="flex items-center space-x-2 text-white/30 text-xs">
+                          <div className="flex items-center space-x-2 text-[var(--color-text-light)] opacity-50 text-xs text-xs">
                              <Clock className="w-3 h-3" />
                              <span className="font-bold">{new Date(secret.createdAt).toLocaleDateString()}</span>
                           </div>
@@ -442,15 +442,15 @@ const Secrets = () => {
                 <div className="flex items-center justify-between mb-8">
                    <div className="flex items-center space-x-3">
                       <Shield className="w-6 h-6 text-purple-400" />
-                      <h2 className="text-2xl font-black text-white tracking-tight">{showModal ? 'Define New Secret' : 'Modify Encryption'}</h2>
+                      <h2 className="text-2xl font-black text-[var(--color-text-primary)] tracking-tight">{showModal ? 'Define New Secret' : 'Modify Encryption'}</h2>
                    </div>
-                   <button onClick={() => { setShowModal(false); setShowEditModal(false); }} className="text-white/20 hover:text-white"><X className="w-6 h-6" /></button>
+                   <button onClick={() => { setShowModal(false); setShowEditModal(false); }} className="text-[var(--color-text-light)] opacity-40 hover:opacity-100"><X className="w-6 h-6" /></button>
                 </div>
 
                 <form onSubmit={showModal ? handleSubmit : handleUpdateSecret} className="space-y-6">
                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2 col-span-2">
-                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Identity Key</label>
+                        <label className="text-[10px] font-black text-[var(--color-text-light)] opacity-50 uppercase tracking-widest ml-1">Identity Key</label>
                         <input
                           type="text"
                           value={formData.key}
