@@ -3,8 +3,6 @@ const cors = require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const app = express();
-
-// CORS configuration
 app.use(cors({
   origin: [
     'http://localhost:5173', 
@@ -25,9 +23,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // true in production
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000 
   }
 }));
 app.use("/api/auth", require("./routes/auth.routes"));
@@ -42,11 +40,9 @@ app.get("/health", (req, res) => {
   res.json({ status: "EnvSync API running" });
 });
 
-// Global error handler - must be last
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
-  
-  // Don't leak error details in production
+
   const isDevelopment = process.env.NODE_ENV !== 'production';
   
   res.status(err.status || 500).json({
@@ -54,8 +50,6 @@ app.use((err, req, res, next) => {
     ...(isDevelopment && { stack: err.stack, error: err })
   });
 });
-
-// Handle 404 for undefined routes
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });

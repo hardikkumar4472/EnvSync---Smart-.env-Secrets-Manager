@@ -28,8 +28,6 @@ exports.manualCleanup = async (req, res) => {
 exports.getCleanupStatus = async (req, res) => {
   try {
     const status = cleanupService.getStatus();
-    
-    // Get count of logs that will be deleted in next cleanup
     const AuditLog = require('../models/audit-log.model');
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const oldLogsCount = await AuditLog.countDocuments({

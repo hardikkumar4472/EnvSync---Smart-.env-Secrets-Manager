@@ -13,8 +13,6 @@ exports.createSecret = async (req, res) => {
     if (!projectId || !environment || !key || !value) {
       return res.status(400).json({ message: "All fields required" });
     }
-
-    // Verify project access
     const project = await Project.findOne({ 
       _id: projectId, 
       isActive: true,
@@ -27,8 +25,6 @@ exports.createSecret = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found or access denied" });
     }
-
-    // Check if secret with same key already exists for this project/environment
     const exists = await Secret.findOne({ projectId, environment, key });
     if (exists) {
       return res.status(409).json({ 
@@ -76,7 +72,6 @@ exports.listSecrets = async (req, res) => {
         .json({ message: "projectId and environment are required" });
     }
 
-    // Verify project access
     const project = await Project.findOne({ 
       _id: projectId, 
       isActive: true,
@@ -126,8 +121,6 @@ exports.getSecretValue = async (req, res) => {
   if (!secret) {
     return res.status(404).json({ message: "Secret not found" });
   }
-
-  // Verify project access
   const project = await Project.findOne({ 
     _id: secret.projectId, 
     isActive: true,
@@ -179,8 +172,6 @@ exports.updateSecret = async (req, res) => {
     if (!secret) {
       return res.status(404).json({ message: "Secret not found" });
     }
-
-    // Verify project access
     const project = await Project.findOne({ 
       _id: secret.projectId, 
       isActive: true,
@@ -193,8 +184,6 @@ exports.updateSecret = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Secret not found or access denied" });
     }
-
-    // If updating key, check if new key already exists
     if (key && key !== secret.key) {
       const exists = await Secret.findOne({ 
         projectId: secret.projectId, 
@@ -211,8 +200,6 @@ exports.updateSecret = async (req, res) => {
       
       secret.key = key;
     }
-
-    // If updating value, encrypt it
     if (value) {
       secret.encryptedValue = encrypt(value);
     }
@@ -250,8 +237,6 @@ exports.deleteSecret = async (req, res) => {
     if (!secret) {
       return res.status(404).json({ message: "Secret not found" });
     }
-
-    // Verify project access
     const project = await Project.findOne({ 
       _id: secret.projectId, 
       isActive: true,
@@ -304,7 +289,6 @@ exports.bulkDeleteSecrets = async (req, res) => {
       });
     }
 
-    // Verify project access
     const project = await Project.findOne({ 
       _id: projectId, 
       isActive: true,

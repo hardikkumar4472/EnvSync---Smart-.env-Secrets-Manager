@@ -1,11 +1,8 @@
 const jwt = require("jsonwebtoken");
-
-// Validate JWT_SECRET is set
 if (!process.env.JWT_SECRET) {
   console.error("ERROR: JWT_SECRET is not set in environment variables!");
   throw new Error("JWT_SECRET is required but not configured");
 }
-
 exports.signToken = (payload) => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not configured");
@@ -22,7 +19,6 @@ exports.verifyToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {
-    // Re-throw with more context
     if (error.name === "JsonWebTokenError") {
       throw new Error("Invalid token");
     } else if (error.name === "TokenExpiredError") {

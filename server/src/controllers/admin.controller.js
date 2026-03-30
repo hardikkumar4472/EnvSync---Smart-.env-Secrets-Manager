@@ -1,15 +1,10 @@
 const User = require("../models/envsync_user.model");
 const Project = require("../models/project.model");
 const { logAudit } = require("../utils/audit");
-
-/**
- * List all users (excluding sensitive data)
- */
 exports.listUsers = async (req, res) => {
   try {
     const users = await User.find({ createdBy: req.user.id }, { email: 1, role: 1, isActive: 1, assignedProjects: 1, createdAt: 1 })
       .populate("assignedProjects", "name");
-    
     res.json({
       count: users.length,
       users,
@@ -30,20 +25,14 @@ exports.assignProjectToUser = async (req, res) => {
     if (!userId || !projectId) {
       return res.status(400).json({ message: "User ID and Project ID are required" });
     }
-
-    // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    // Check if project exists
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-
-    // Add project to user's assignedProjects if not already present
     if (user.assignedProjects.includes(projectId)) {
       return res.status(400).json({ message: "Project already assigned to this user" });
     }
@@ -118,14 +107,10 @@ exports.unassignProjectFromUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
-
-    // Check if user exists and was created by this admin
     const user = await User.findOne({ _id: userId, createdBy: req.user.id });
     if (!user) {
       return res.status(404).json({ message: "User not found or you don't have permission to delete this user" });
     }
-
-    // Role check - can't delete other admins if they're not self-created (already covered by createdBy)
     
     await User.findByIdAndDelete(userId);
 

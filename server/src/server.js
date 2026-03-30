@@ -6,22 +6,14 @@ const cleanupService = require("./services/cleanup.service");
 const { initSocket } = require("./config/socket");
 
 const PORT = process.env.PORT || 4000;
-
-// Create HTTP server
 const server = http.createServer(app);
-
-// Initialize Socket.io
 initSocket(server);
 
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
-    
-    // Start the cleanup service
     cleanupService.startScheduledCleanup();
-    
-    // Listen on the HTTP server, not app directly
     server.listen(PORT, () =>
       console.log(`EnvSync API running on port ${PORT}`)
     );
@@ -32,7 +24,6 @@ mongoose
     process.exit(1);
   });
 
-// Graceful shutdown
 const shutdown = () => {
   console.log('\n⚠ Shutting down gracefully...');
   cleanupService.stopScheduledCleanup();

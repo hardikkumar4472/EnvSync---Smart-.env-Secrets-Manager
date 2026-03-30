@@ -3,7 +3,6 @@ require("dotenv").config();
 const { Command } = require("commander");
 const { version } = require("../package.json");
 const program = new Command();
-
 program
   .name("envsync")
   .description("Runtime-only secret injection CLI")

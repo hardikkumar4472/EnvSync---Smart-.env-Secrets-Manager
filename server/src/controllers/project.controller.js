@@ -11,8 +11,6 @@ exports.createProject = async (req, res) => {
     if (!name) {
       return res.status(400).json({ message: "Project name is required" });
     }
-
-    // Check if project with same name exists for this user
     const exists = await Project.findOne({ name, createdBy: req.user.id });
     if (exists) {
       return res.status(409).json({ message: "Project already exists" });
@@ -45,7 +43,6 @@ exports.createProject = async (req, res) => {
  */
 exports.listProjects = async (req, res) => {
   try {
-    // Return projects created by the current user OR assigned to them
     const query = { isActive: true };
     if (req.user.role !== 'admin') {
       query.$or = [
@@ -53,9 +50,6 @@ exports.listProjects = async (req, res) => {
         { _id: { $in: req.user.assignedProjects } }
       ];
     } else {
-      // If admin, they might want to see all projects they created
-      // or we can allow them to see all projects in the system
-      // For now, let's keep it to projects they created as per original logic
       query.createdBy = req.user.id;
     }
 
@@ -80,8 +74,6 @@ exports.listProjects = async (req, res) => {
 exports.getProject = async (req, res) => {
   try {
     const { projectId } = req.params;
-
-    // Return project if it belongs to the current user OR is assigned to them
     const query = { _id: projectId, isActive: true };
     if (req.user.role !== 'admin') {
       query.$or = [
@@ -98,7 +90,6 @@ exports.getProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Get secret count for this project
     const secretCount = await Secret.countDocuments({ projectId });
 
     res.json({
@@ -124,7 +115,6 @@ exports.updateProject = async (req, res) => {
       return res.status(400).json({ message: "At least one field (name or description) is required" });
     }
 
-    // Only allow update if project belongs to the current user
     const project = await Project.findOne({ 
       _id: projectId, 
       isActive: true, 
@@ -134,8 +124,6 @@ exports.updateProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-
-    // Check if new name already exists for this user (if name is being changed)
     if (name && name !== project.name) {
       const exists = await Project.findOne({ 
         name, 
@@ -146,8 +134,6 @@ exports.updateProject = async (req, res) => {
         return res.status(409).json({ message: "Project name already exists" });
       }
     }
-
-    // Update fields
     if (name) project.name = name;
     if (description !== undefined) project.description = description;
 
@@ -175,8 +161,6 @@ exports.updateProject = async (req, res) => {
 exports.deleteProject = async (req, res) => {
   try {
     const { projectId } = req.params;
-
-    // Only allow delete if project belongs to the current user
     const project = await Project.findOne({ 
       _id: projectId, 
       isActive: true, 
@@ -186,8 +170,6 @@ exports.deleteProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-
-    // Check if project has secrets
     const secretCount = await Secret.countDocuments({ projectId });
     
     if (secretCount > 0) {
@@ -197,7 +179,6 @@ exports.deleteProject = async (req, res) => {
       });
     }
 
-    // Soft delete
     project.isActive = false;
     await project.save();
 
@@ -230,8 +211,6 @@ exports.permanentlyDeleteProject = async (req, res) => {
         message: "Please confirm deletion by sending { confirm: 'DELETE' }" 
       });
     }
-
-    // Only allow delete if project belongs to the current user
     const project = await Project.findOne({ 
       _id: projectId, 
       createdBy: req.user.id 
@@ -240,11 +219,7 @@ exports.permanentlyDeleteProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-
-    // Delete all secrets for this project
     const secretDeleteResult = await Secret.deleteMany({ projectId });
-
-    // Permanently delete the project
     await Project.findByIdAndDelete(projectId);
 
     await logAudit({

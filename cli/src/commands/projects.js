@@ -5,12 +5,10 @@ module.exports = async () => {
   try {
     const response = await api.get("/projects");
     const { projects, count } = response.data;
-
     if (count === 0) {
       console.log(chalk.yellow("No projects found."));
       return;
     }
-
     console.log(chalk.cyan(`\nFound ${count} project(s):\n`));
     console.log(chalk.bold("ID".padEnd(26) + " | NAME"));
     console.log("-".repeat(50));

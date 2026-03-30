@@ -2,12 +2,10 @@ const crypto = require("crypto");
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
-
-// 🔐 Derive a fixed 32-byte key from env secret
 const MASTER_KEY = crypto
   .createHash("sha256")
   .update(process.env.SECRET_MASTER_KEY)
-  .digest(); // ALWAYS 32 bytes
+  .digest(); 
 
 exports.encrypt = (plainText) => {
   const iv = crypto.randomBytes(IV_LENGTH);

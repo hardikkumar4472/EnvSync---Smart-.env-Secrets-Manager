@@ -14,7 +14,6 @@ const projectSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Unique constraint: name must be unique per user (admin)
 projectSchema.index({ name: 1, createdBy: 1 }, { unique: true });
 
 module.exports = mongoose.model("Project", projectSchema);

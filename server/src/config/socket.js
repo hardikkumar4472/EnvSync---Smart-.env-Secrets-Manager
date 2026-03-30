@@ -1,7 +1,5 @@
 const socketIo = require('socket.io');
-
 let io;
-
 const initSocket = (server) => {
   io = socketIo(server, {
     cors: {
@@ -10,17 +8,12 @@ const initSocket = (server) => {
       credentials: true
     }
   });
-
   io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
-
-    // Join a room based on user role or id if provided in query or auth
-    // For now, just basic connection logic
     socket.on('join_room', (room) => {
         socket.join(room);
         console.log(`Socket ${socket.id} joined room ${room}`);
     });
-
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
     });
@@ -28,14 +21,12 @@ const initSocket = (server) => {
 
   return io;
 };
-
 const getIO = () => {
   if (!io) {
     throw new Error('Socket.io not initialized!');
   }
   return io;
 };
-
 module.exports = {
   initSocket,
   getIO

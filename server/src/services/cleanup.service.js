@@ -33,19 +33,11 @@ class CleanupService {
     }
   }
 
-  /**
-   * Start the scheduled cleanup job
-   * Runs every hour to check and delete old logs
-   */
   startScheduledCleanup() {
     if (this.isRunning) {
       console.log('⚠ Cleanup service is already running');
       return;
     }
-
-    // Run cleanup every hour (at minute 0)
-    // Cron format: minute hour day month weekday
-    // '0 * * * *' means: at minute 0 of every hour
     this.cronJob = cron.schedule('0 * * * *', async () => {
       console.log('⏰ Running scheduled audit log cleanup...');
       await this.cleanupOldLogs();
@@ -53,8 +45,7 @@ class CleanupService {
 
     this.isRunning = true;
     console.log('✓ Audit log cleanup service started (runs every hour)');
-    
-    // Run cleanup immediately on startup
+
     this.cleanupOldLogs().catch(err => {
       console.error('Initial cleanup failed:', err.message);
     });
@@ -82,5 +73,4 @@ class CleanupService {
   }
 }
 
-// Export singleton instance
 module.exports = new CleanupService();

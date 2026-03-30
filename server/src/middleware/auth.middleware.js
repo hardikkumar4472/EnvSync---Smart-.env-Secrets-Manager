@@ -28,7 +28,6 @@ module.exports = async (req, res, next) => {
       req.user = user;
       next();
     } catch (err) {
-      // Log error for debugging (but don't expose details to client)
       console.error("Token verification error:", err.message);
       return res.status(401).json({ 
         message: err.message === "Token expired" ? "Token expired" : "Invalid token" 

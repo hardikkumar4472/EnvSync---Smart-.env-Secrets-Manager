@@ -5,40 +5,28 @@ const { logAudit } = require("../utils/audit");
 exports.register = async (req, res) => {
   try {
     const { email, password, role } = req.body;
-
-    // For Validation
     if (!email || !password || !role) {
       return res.status(400).json({ message: "Email, password, and role are required" });
     }
-
-    // Validate role - Only admin can be created through public registration
     if (role !== 'admin') {
       return res.status(403).json({ message: "Only admin accounts can be created through public registration. Developer accounts must be created by an administrator." });
     }
-
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists with this email" });
     }
-
-    // Create new user
     const user = new User({
       email,
       password,
       role,
       isActive: true
     });
-
     await user.save();
-
-    // Generate token
     const token = signToken({
       id: user._id,
       role: user.role,
     });
 
-    // Log registration
     logAudit({
       user: { id: user._id, role: user.role },
       action: "REGISTER",
@@ -87,8 +75,6 @@ exports.adminCreateUser = async (req, res) => {
     });
 
     await user.save();
-
-    // Send email with credentials
     const emailSent = await sendWelcomeEmail(email, password);
 
     res.status(201).json({

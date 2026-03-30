@@ -1,0 +1,101 @@
+# EnvSync - Patent Innovation Details
+
+Project Name: EnvSync: Secure Runtime Secret Injection & Data Loss Prevention System
+
+## 1. Runtime-Only Secret Injection (Disk-less Operation)
+- Innovation: Method for injecting sensitive configuration into child processes via memory-only buffers.
+- Benefit: Eliminates physical footprint (no .env files), preventing accidental commit to Git or unauthorized FS access.
+- Mechanism: CLI fetches AES-256-GCM encrypted secrets, decrypts in RAM, and spawns application with pre-populated environment variables.
+
+## 2. Proactive Secret Leak Shield (Runtime DLP)
+- Innovation: A "Global Security Hook" that overrides standard I/O (console.log, stdout) and File System (fs.writeFile) methods.
+- Benefit: Prevents accidental logging of decrypted secrets to terminal buffers, pipe-files, or log-management systems.
+- Mechanism: Real-time string pattern matching against a dynamic "Secret Set" with automatic [REDACTED] replacement.
+
+## 3. Real-Time Security Audit & Leak Reporting
+- Innovation: Automatic generation of "Leak Attempt" audit logs.
+- Benefit: Alerts security teams when developers or applications attempt to output sensitive data, even if the output was successfully redacted.
+
+## 4. Self-Cleansing Initialization Buffer
+- Innovation: Temporary environment variables used for bootstrapping (keys/tokens) are programmatically deleted immediately after the security shield is active.
+- Benefit: Prevents "process.env inspection" attacks from revealing the system's own bootstrap credentials.
+
+## 5. Centralized Multi-Tenant Secret Management
+- Innovation: Architecture separating Secret Managers (Admins) from Secret Users (Developers/Runtimes).
+- Benefit: Granular Role-Based Access Control (RBAC) specifically tailored for secret lifecycles.
+
+---
+
+# Technical Approach Used
+
+## A. AES-256-GCM Encryption Strategy
+- Purpose: Secure "At-Rest" storage in MongoDB.
+- Method: 
+  - Derive a 32-byte key from a master key using SHA-256.
+  - Generate a unique 12-byte random Initialization Vector (IV) for every secret.
+  - Encrypt with AES-256-GCM to get consistent integrity verification (Auth Tags).
+
+## B. Child Process Runtime Injection
+- Purpose: "Zero-File" environment setup.
+- Method:
+  - CLI fetches decrypted secrets into a RAM buffer.
+  - Uses `child_process.spawn()` to create a subprocess.
+  - Merges secrets into the `env` option of the child process.
+  - Secrets are never written to any persistent storage or temporary files.
+
+## C. Global I/O Interception (The "Security Loader")
+- Purpose: Data Loss Prevention (DLP).
+- Method:
+  - Hooks into `console.log`, `console.info`, `console.warn`, `console.error`.
+  - Redirects `process.stdout.write` and `process.stderr.write`.
+  - Overwrites `fs.writeFile` and `fs.writeFileSync`.
+  - Every call is proxied through a "Redaction Engine" before reaching original methods.
+
+## D. Real-Time Pattern Matching Engine
+- Purpose: Instant identification of secret leaks.
+- Method:
+  - Maintains an in-memory `Set` of all active secret values.
+  - Recursive "Deep Object Scanning" for complex data structures (safe from circular references).
+  - Regular expression-based string replacement for log statements and file writes.
+
+## E. Distributed Audit & Reporting
+- Purpose: Compliance and Alerting.
+- Method:
+  - Uses an asynchronous, safe HTTP reporting mechanism for intercepted leaks.
+  - Integrates with a centralized MongoDB-backed Audit Service.
+  - Metadata includes IP tracking, Project ID, Env, and specific leak source.
+
+---
+
+# Integrated Testing Procedure (Brief)
+
+Follow this procedure to verify the system end-to-end using the published CLI and deployed API.
+
+### 1. Installation & environment setup
+- Install the CLI globally: `npm i -g @hardik010190/envsync`
+- Configure the CLI to use the production server:
+  `envset ENVSYNC_API_URL=https://envsync-dp6u.onrender.com/api` (or via .env)
+
+### 2. Authentication
+- Run: `envsync login`
+- Enter credentials for the deployed environment.
+- Verify status: `envsync whoami`
+
+### 3. Project & Secret Creation (Admin Task)
+- Create a project (e.g., "PatentDemo").
+- Add a secret: `Key: DATABASE_URL`, `Value: secret_mongodb_connection_string`.
+- Environment: `prod`.
+
+### 4. Zero-File Runtime Injection Test
+- Create a small test script `app.js`:
+  ```javascript
+  console.log("App Started!");
+  console.log("DB URL from environment:", process.env.DATABASE_URL);
+  ```
+- Run with injection: `envsync run --project YOUR_PROJECT_ID --env prod node app.js`
+
+### 5. Verification of Innovation Pillars
+- **Runtime Injection**: Verify the app prints the `DATABASE_URL` value from RAM.
+- **DLP Redaction**: Verify that if you try to `console.log(process.env.DATABASE_URL)`, the shield intercepts it and prints `[REDACTED]` instead of the plain value.
+- **Disk Integrity**: Check that NO `.env` file was created in your local directory during the run.
+- **Audit Logging**: Access the deployed dashboard or API to confirm the "RUNTIME_SECRET_ACCESS" and "Redacted secret from console.log" audit records exist for your session.
