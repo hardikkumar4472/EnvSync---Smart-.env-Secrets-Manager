@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envsync-server
+  namespace: envsync
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: envsync-server
+  template:
+    metadata:
+      labels:
+        app: envsync-server
+    spec:
+      containers:
+      - name: envsync-server
+        image: envsync-server:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 4000
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: envsync-config
+              key: PORT
+        - name: JWT_EXPIRES_IN
+          valueFrom:
+            configMapKeyRef:
+              name: envsync-config
+              key: JWT_EXPIRES_IN
+        - name: EMAIL_FROM
+          valueFrom:
+            configMapKeyRef:
+              name: envsync-config
+              key: EMAIL_FROM
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              name: envsync-secrets
+              key: MONGO_URI
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: envsync-secrets
+              key: JWT_SECRET
+        - name: SECRET_MASTER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envsync-secrets
+              key: SECRET_MASTER_KEY
+        - name: BREVO_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envsync-secrets
+              key: BREVO_API_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-service
+  namespace: envsync
+spec:
+  ports:
+  - port: 4000
+    targetPort: 4000
+  selector:
+    app: envsync-server
