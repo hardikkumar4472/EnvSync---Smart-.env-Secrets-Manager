@@ -15,7 +15,8 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       // Initialize socket connection
-      const newSocket = io('https://envsync-sockets.onrender.com', {
+      const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000';
+      const newSocket = io(socketUrl, {
         withCredentials: true,
       });
 
