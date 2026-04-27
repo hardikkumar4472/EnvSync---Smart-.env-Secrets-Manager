@@ -1,4 +1,7 @@
 const socketIo = require('socket.io');
+const { createAdapter } = require('@socket.io/redis-adapter');
+const { redisConnection } = require('./redis');
+
 let io;
 const initSocket = (server) => {
   io = socketIo(server, {
@@ -22,6 +25,12 @@ const initSocket = (server) => {
       credentials: true
     }
   });
+
+  // Use Redis adapter for multi-instance scaling
+  const pubClient = redisConnection;
+  const subClient = pubClient.duplicate();
+  io.adapter(createAdapter(pubClient, subClient));
+
   io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
     socket.on('join_room', (room) => {

@@ -2,7 +2,17 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const { redisConnection } = require("./config/redis");
+const RedisStore = require("connect-redis").default;
+
 const app = express();
+
+// Initialize Redis Session Store
+let redisStore = new RedisStore({
+  client: redisConnection,
+  prefix: "envsync_sess:",
+});
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -30,13 +40,14 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({
+  store: redisStore,
   secret: process.env.SESSION_SECRET || 'envsync-secret-key-change-it',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days session
   }
 }));
 app.use("/api/auth", require("./routes/auth.routes"));

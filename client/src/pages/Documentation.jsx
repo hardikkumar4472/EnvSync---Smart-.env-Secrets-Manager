@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Shield, Code, Users, Key, FileText, Terminal, ArrowLeft, Moon, Sun, ChevronDown } from 'lucide-react';
+import { 
+  BookOpen, Shield, Code, Users, Key, FileText, Terminal, 
+  ArrowLeft, Moon, Sun, ChevronDown, Zap, Cpu, Lock, 
+  Globe, Activity, ShieldCheck, Database, Layout, Server
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import PageTransition from '../components/PageTransition';
 
 const Documentation = () => {
   const { user } = useAuth();
@@ -9,186 +14,219 @@ const Documentation = () => {
   const isPublicView = !user;
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden">
-      {/* Background & Effects */}
-      <div className="homepage-bg" />
-      <div className="scanline" />
-      <div className="fixed inset-0 pointer-events-none z-[-1] bg-black/10 dark:bg-black/30" />
+    <PageTransition>
+      <div className="min-h-screen relative overflow-x-hidden pb-20">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/[0.03] blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/[0.03] blur-[120px] pointer-events-none" />
 
-      {/* Header (Always show themed header for consistent UI) */}
-      <header className="glass-header px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-md shadow-lg border border-white/30">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter text-white">EnvSync</span>
-          </div>
-
-          <div className="flex items-center space-x-6">
-            <Link to="/" className="text-white/80 hover:text-white transition-colors font-medium flex items-center space-x-2">
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home</span>
-            </Link>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2.5 rounded-full transition-all bg-white/10 hover:bg-white/20 border border-white/20 text-white"
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20 space-y-16">
-        {/* Title Section */}
-        <div className="text-center space-y-4">
-          <h1 className="text-5xl font-black text-white tracking-tight">
-            System <span className="text-cyan-400">Documentation</span>
-          </h1>
-          <p className="text-xl text-white/60 max-w-2xl mx-auto font-medium">
-            Complete administrator and developer guide for managing EnvSync industrial secrets.
-          </p>
-        </div>
-
-        {/* Administrator Guide */}
-        <div className="hero-glass-card p-10 relative overflow-hidden group">
-          <div className="flex items-center space-x-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-500/20 shadow-lg">
-              <Shield className="w-6 h-6 text-red-500" />
-            </div>
-            <h2 className="text-3xl font-bold text-white">Administrator Guide</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-cyan-400 font-bold text-lg mb-3 uppercase tracking-wider">1. Getting Started</h3>
-                <ul className="space-y-3">
-                  {['Login with your admin credentials', 'Create projects for your applications', 'Add secrets for each environment', 'Monitor audit logs for security transparency'].map((item, i) => (
-                    <li key={i} className="flex items-start space-x-3 text-white/70">
-                      <span className="text-cyan-500 mt-1 font-bold">»</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+        {/* Header - Integrated with App Theme */}
+        <header className="glass-header px-8 py-6 sticky top-0 z-50 backdrop-blur-xl border-b border-white/5">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-cyan-500 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all">
+                <Shield className="w-7 h-7 text-black" />
               </div>
-              
-              <div>
-                <h3 className="text-cyan-400 font-bold text-lg mb-3 uppercase tracking-wider">2. Managing Projects</h3>
-                <p className="text-white/60 mb-4">Projects represent your core applications and isolated environments.</p>
-                <div className="space-y-2">
-                  <div className="feature-compact-card">
-                    <span className="text-white font-bold">New Project:</span>
-                    <span className="text-white/50 ml-2">Define cross-environment secret containers.</span>
+              <div className="flex flex-col">
+                 <span className="text-2xl font-black tracking-tighter text-white leading-none">EnvSync</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mt-1">System_Protocol</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-8">
+              <Link to="/" className="text-white/40 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest flex items-center space-x-2 group">
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span>Return to Central</span>
+              </Link>
+              <div className="h-8 w-px bg-white/10" />
+              <button
+                onClick={toggleDarkMode}
+                className="w-10 h-10 rounded-xl transition-all bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white/60"
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <main className="relative z-10 max-w-7xl mx-auto px-8 pt-20 space-y-24">
+          <div className="text-center space-y-6">
+            <div className="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-cyan-500/5 border border-cyan-500/20 text-cyan-400 mb-4 animate-pulse">
+               <Zap className="w-4 h-4" />
+               <span className="text-[10px] font-black uppercase tracking-[0.3em]">Live Documentation Shards</span>
+            </div>
+            <h1 className="text-7xl font-black text-white tracking-tighter leading-none">
+              Operational <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">Manual</span>
+            </h1>
+            <p className="text-lg text-white/40 max-w-3xl mx-auto font-medium leading-relaxed">
+              Complete administrator and developer guide for managing EnvSync industrial secrets. 
+              Synchronize your development lifecycle with absolute security protocol.
+            </p>
+          </div>
+
+          {/* Guide Sections */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {/* Administrator Section */}
+            <div className="hero-glass-card p-12 relative overflow-hidden group border-white/5 bg-white/[0.01]">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/[0.02] blur-[80px] pointer-events-none" />
+              <div className="flex items-center space-x-5 mb-12">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+                  <ShieldCheck className="w-7 h-7 text-cyan-400" />
+                </div>
+                <div>
+                   <h2 className="text-3xl font-black text-white tracking-tight">Admin Protocol</h2>
+                   <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mt-1">Management_Infrastructure</p>
+                </div>
+              </div>
+
+              <div className="space-y-12">
+                <div className="space-y-6">
+                  <h3 className="text-white/40 font-black text-xs uppercase tracking-[0.4em] flex items-center space-x-3">
+                     <Layout className="w-4 h-4 text-cyan-500" />
+                     <span>01_Core_Setup</span>
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4">
+                     {[
+                       { title: 'Identity Verification', desc: 'Authenticate via secure administrative portal.' },
+                       { title: 'Vault Initialization', desc: 'Establish encrypted project containers.' },
+                       { title: 'Entity Provisioning', desc: 'Grant project access to development shards.' }
+                     ].map((step, i) => (
+                       <div key={i} className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-cyan-500/20 transition-colors group/item">
+                          <span className="text-cyan-500 font-black text-[10px] uppercase mb-1 block">Phase_{i+1}</span>
+                          <h4 className="text-white font-bold text-sm">{step.title}</h4>
+                          <p className="text-white/30 text-xs mt-1">{step.desc}</p>
+                       </div>
+                     ))}
                   </div>
-                  <div className="feature-compact-card">
-                    <span className="text-white font-bold">Project ID:</span>
-                    <span className="text-white/50 ml-2">Unique identifiers for CLI memory injection.</span>
+                </div>
+
+                <div className="space-y-6">
+                  <h3 className="text-white/40 font-black text-xs uppercase tracking-[0.4em] flex items-center space-x-3">
+                     <Database className="w-4 h-4 text-cyan-500" />
+                     <span>02_Secret_Lifecycle</span>
+                  </h3>
+                  <div className="p-6 rounded-3xl bg-cyan-500/5 border border-cyan-500/10 relative overflow-hidden">
+                     <div className="absolute top-0 right-0 px-3 py-1 bg-cyan-500 text-black text-[8px] font-black uppercase tracking-widest rounded-bl-xl">Secure_Note</div>
+                     <p className="text-sm text-white/70 leading-relaxed font-medium">
+                       Values are encrypted with AES-256-GCM. Decryption occurs only in ephemeral RAM. Persistent storage never contains plaintext payloads.
+                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-cyan-400 font-bold text-lg mb-3 uppercase tracking-wider">3. Managing Secrets</h3>
-                <p className="text-white/60 mb-4">Industrial grade AES-256-GCM encryption at rest.</p>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 border-l-4 border-l-cyan-500">
-                  <p className="text-sm text-white/80 leading-relaxed font-mono">
-                    Values are only decrypted in the application's RAM during runtime. Never written to persistent storage.
-                  </p>
+            {/* CLI / Developer Section */}
+            <div className="hero-glass-card p-12 relative overflow-hidden group border-white/5 bg-white/[0.01]">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/[0.02] blur-[80px] pointer-events-none" />
+              <div className="flex items-center space-x-5 mb-12">
+                <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.1)]">
+                  <Terminal className="w-7 h-7 text-purple-400" />
+                </div>
+                <div>
+                   <h2 className="text-3xl font-black text-white tracking-tight">Developer SDK</h2>
+                   <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mt-1">CLI_Injection_Engine</p>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-cyan-400 font-bold text-lg mb-3 uppercase tracking-wider">4. Security Compliance</h3>
-                <ul className="grid grid-cols-2 gap-4">
-                  {['SOC2 Ready', 'Full Audit Trail', 'Memory Only', 'RBAC Enabled'].map((item, i) => (
-                    <li key={i} className="flex items-center space-x-2 text-white/60 bg-white/5 p-3 rounded-lg border border-white/5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div className="space-y-10">
+                <div className="bg-black/60 rounded-3xl p-10 border border-white/5 font-mono relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-transparent opacity-20" />
+                  <div className="flex items-center space-x-2 mb-8">
+                    <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                    <div className="w-3 h-3 rounded-full bg-amber-500/50" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-500/50" />
+                    <span className="text-white/20 text-[10px] ml-6 tracking-[0.4em] uppercase font-black">Secure_Shell_V4.2</span>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                       <p className="text-[10px] text-white/20 uppercase tracking-widest">// Initialize session</p>
+                       <div className="flex items-center space-x-4">
+                          <span className="text-purple-500 font-bold">$</span>
+                          <span className="text-white/90 font-bold">envsync login</span>
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                       <p className="text-[10px] text-white/20 uppercase tracking-widest">// Link vault container</p>
+                       <div className="flex items-center space-x-4">
+                          <span className="text-purple-400 font-bold">$</span>
+                          <span className="text-white/90 font-bold">envsync use <span className="text-cyan-400">PROJ_82X1</span></span>
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                       <p className="text-[10px] text-white/20 uppercase tracking-widest">// Inject secrets to runtime</p>
+                       <div className="flex items-center space-x-4">
+                          <span className="text-purple-400 font-bold">$</span>
+                          <span className="text-white/90 font-bold">envsync run <span className="text-purple-400">--env prod</span> npm start</span>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5">
+                      <Cpu className="w-5 h-5 text-purple-400 mb-3" />
+                      <h4 className="text-xs font-black text-white uppercase tracking-widest">Fast_Sync</h4>
+                      <p className="text-[10px] text-white/30 mt-1">Ultra-low latency secret retrieval via Redis edge.</p>
+                   </div>
+                   <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5">
+                      <Lock className="w-5 h-5 text-purple-400 mb-3" />
+                      <h4 className="text-xs font-black text-white uppercase tracking-widest">E2E_Enc</h4>
+                      <p className="text-[10px] text-white/30 mt-1">Encrypted transmission from vault to CLI.</p>
+                   </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* CLI Usage Guide */}
-        <div className="hero-glass-card p-10 relative overflow-hidden group border-l-8 border-l-purple-500">
-          <div className="flex items-center space-x-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-lg">
-              <Terminal className="w-6 h-6 text-purple-500" />
-            </div>
-            <h2 className="text-3xl font-bold text-white">Developer CLI Guide</h2>
+          {/* Compliance Grid */}
+          <div className="space-y-12">
+             <div className="text-center">
+                <h3 className="text-white/20 font-black text-xs uppercase tracking-[0.6em]">Security_Standards_&_Compliance</h3>
+             </div>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  { icon: Shield, label: 'SOC2 Ready', color: 'text-cyan-400' },
+                  { icon: Activity, label: 'Audit Stream', color: 'text-red-400' },
+                  { icon: Server, label: 'Memory Only', color: 'text-purple-400' },
+                  { icon: Users, label: 'RBAC Control', color: 'text-emerald-400' }
+                ].map((item, i) => (
+                  <div key={i} className="hero-glass-card p-6 flex flex-col items-center justify-center text-center space-y-4 border-white/5 hover:bg-white/[0.04] transition-all">
+                     <item.icon className={`w-8 h-8 ${item.color}`} />
+                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{item.label}</span>
+                  </div>
+                ))}
+             </div>
           </div>
 
-          <div className="bg-black/40 rounded-2xl p-8 border border-white/5 font-mono">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-white/40 text-xs ml-4 tracking-widest">ENVSYNC_SECURE_SHELL</span>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex space-x-4">
-                <span className="text-purple-400">$</span>
-                <span className="text-white/90">envsync login</span>
-                <span className="text-white/30 text-sm"># Identity verification</span>
-              </div>
-              <div className="flex space-x-4">
-                <span className="text-purple-400">$</span>
-                <span className="text-white/90">envsync use [project_id]</span>
-                <span className="text-white/30 text-sm"># Local config</span>
-              </div>
-              <div className="flex space-x-4">
-                <span className="text-purple-400">$</span>
-                <span className="text-white/90">envsync run --env prod npm start</span>
-                <span className="text-white/30 text-sm"># Injection complete</span>
-              </div>
-            </div>
+          {/* Terminal / Call to Action */}
+          <div className="hero-glass-card p-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-[40px] overflow-hidden">
+             <div className="bg-[#0A0A0A] rounded-[38px] p-16 text-center space-y-8 relative overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+                <h2 className="text-4xl font-black text-white tracking-tight">Ready to Secure Your Deployment?</h2>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                   <Link to="/app/projects" className="btn-purple px-12 py-5 rounded-2xl flex items-center space-x-3 group shadow-2xl shadow-purple-500/20">
+                      <span className="font-black uppercase tracking-widest text-xs">Initialize Vault</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                   </Link>
+                   <Link to="/app/cli-commands" className="btn-glass px-12 py-5 rounded-2xl flex items-center space-x-3 group text-white/60 hover:text-white">
+                      <Terminal className="w-4 h-4" />
+                      <span className="font-black uppercase tracking-widest text-xs">Explore CLI Commands</span>
+                   </Link>
+                </div>
+             </div>
           </div>
+        </main>
 
-          <div className="mt-8 flex justify-center">
-            <Link to="/app/cli-commands" className="btn-purple py-4 px-12 text-lg inline-flex items-center space-x-3">
-              <span>View Full Reference</span>
-              <Code className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Action Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link to="/app/projects" className="hero-glass-card p-8 transition-all hover:scale-[1.02] hover:bg-white/5">
-            <Key className="w-8 h-8 text-cyan-400 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Projects</h3>
-            <p className="text-white/50 text-sm">Initialize secure environment containers.</p>
-          </Link>
-          
-          <Link to="/app/audit-logs" className="hero-glass-card p-8 transition-all hover:scale-[1.02] hover:bg-white/5">
-            <FileText className="w-8 h-8 text-red-500 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Audit Trails</h3>
-            <p className="text-white/50 text-sm">Track real-time encryption activities.</p>
-          </Link>
-
-          <Link to="/app/dashboard" className="hero-glass-card p-8 transition-all hover:scale-[1.02] hover:bg-white/5">
-            <Users className="w-8 h-8 text-purple-400 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Admin Dashboard</h3>
-            <p className="text-white/50 text-sm">Monitor overall system security health.</p>
-          </Link>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="py-16 glass-footer text-center mt-20 relative z-10">
-        <span className="text-2xl font-black text-white">EnvSync</span>
-        <p className="text-white/30 text-xs uppercase tracking-widest mt-4">© 2026 | All Rights Reserved</p>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer className="py-20 text-center relative z-10 opacity-30">
+          <div className="w-12 h-1 bg-white/10 mx-auto mb-10 rounded-full" />
+          <span className="text-3xl font-black text-white tracking-tighter">EnvSync</span>
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] mt-6">© 2026_Terminal_Identity_Managed</p>
+        </footer>
+      </div>
+    </PageTransition>
   );
 };
 

@@ -52,4 +52,10 @@ const auditLogSchema = new mongoose.Schema(
   }
 );
 
+// Performance Indexes for high-scale querying
+auditLogSchema.index({ projectId: 1, createdAt: -1 });
+auditLogSchema.index({ userId: 1, createdAt: -1 });
+auditLogSchema.index({ action: 1, createdAt: -1 });
+auditLogSchema.index({ createdAt: -1 }); // Global feed optimization
+
 module.exports = mongoose.model("AuditLog", auditLogSchema);
