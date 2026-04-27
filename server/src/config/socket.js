@@ -3,7 +3,21 @@ let io;
 const initSocket = (server) => {
   io = socketIo(server, {
     cors: {
-      origin: ['http://localhost:5173', 'http://localhost:3000', 'https://envsync-sockets.onrender.com'],
+      origin: function (origin, callback) {
+        const allowedOrigins = [
+          'http://localhost:5173',
+          'http://localhost:3000',
+          'https://envsync-sockets.onrender.com',
+          'https://envsync-rsm.vercel.app',
+          process.env.FRONTEND_URL
+        ].filter(Boolean);
+        
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       methods: ['GET', 'POST'],
       credentials: true
     }
