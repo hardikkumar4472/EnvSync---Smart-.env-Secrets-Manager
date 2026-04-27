@@ -125,10 +125,6 @@ const About = () => {
           
           {/* Hero Section */}
           <div className="text-center mb-32 fade-in-down">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-8">
-              <Activity className="w-4 h-4" />
-              <span>v2.0 Now Live - Military Grade Encryption</span>
-            </div>
             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tighter leading-[0.9] text-balance">
               Secrets are better <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500">Left in Memory.</span>
