@@ -7,6 +7,11 @@ import { SocketProvider } from './contexts/SocketContext';
 import App from './App';
 import './index.css';
 
+// Redirect from old Render frontend to new Vercel frontend
+if (window.location.hostname.includes('onrender.com')) {
+  window.location.href = 'https://envsync-rsm.vercel.app' + window.location.pathname + window.location.search;
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
