@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { 
   BookOpen, Shield, Code, Users, Key, FileText, Terminal, 
-  ArrowLeft, Moon, Sun, ChevronDown, Zap, Cpu, Lock, 
+  ArrowLeft, ChevronDown, Zap, Cpu, Lock, 
   Globe, Activity, ShieldCheck, Database, Layout, Server,
   ChevronRight
 } from 'lucide-react';
@@ -11,7 +11,7 @@ import PageTransition from '../components/PageTransition';
 
 const Documentation = () => {
   const { user } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isDarkMode } = useTheme();
   const isPublicView = !user;
 
   return (
@@ -39,13 +39,7 @@ const Documentation = () => {
                 <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform" />
                 <span className="hidden xs:inline">Return to Central</span>
               </Link>
-              <div className="h-6 sm:h-8 w-px bg-white/10" />
-              <button
-                onClick={toggleDarkMode}
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl transition-all bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white/60"
-              >
-                {isDarkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
-              </button>
+
             </div>
           </div>
         </header>

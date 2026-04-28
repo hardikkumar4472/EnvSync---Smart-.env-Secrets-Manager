@@ -12,8 +12,6 @@ import {
   Menu,
   X,
   Shield,
-  Moon,
-  Sun,
   ChevronDown,
   Users,
   User as UserIcon
@@ -21,7 +19,7 @@ import {
 
 const Layout = () => {
   const { user, logout } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isDarkMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -7,7 +7,7 @@ import { Shield, AlertCircle, ArrowLeft, Lock, Mail, UserPlus, ChevronRight, Act
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isDarkMode } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

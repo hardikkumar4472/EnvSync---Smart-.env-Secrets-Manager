@@ -6,7 +6,7 @@ import { Shield, AlertCircle, ArrowLeft, Lock, Mail, ChevronRight, Activity } fr
 
 const Login = () => {
   const { login } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isDarkMode } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');

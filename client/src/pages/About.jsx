@@ -1,7 +1,7 @@
 import { useState, useEffect, memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Shield, ArrowRight, BookOpen, Moon, Sun, Lock, Zap, FileText, 
+  Shield, ArrowRight, BookOpen, Lock, Zap, FileText, 
   CheckCircle, Database, Key, Code, User, Github, Linkedin, 
   Mail, X, Terminal, Cpu, Globe, Server, Activity, Layers,
   ChevronRight, ExternalLink
@@ -35,7 +35,7 @@ const Step = memo(({ number, title, description, icon: Icon }) => (
 ));
 
 const About = () => {
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isDarkMode } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [loadingText, setLoadingText] = useState('');
   const [isDevModalOpen, setIsDevModalOpen] = useState(false);

@@ -24,13 +24,8 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('darkMode', 'true');
   }, []);
 
-  // No-op toggle to prevent UI errors if called
-  const toggleDarkMode = () => {
-    console.log("Manual override detected: Theme is locked by policy.");
-  };
-
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
+    <ThemeContext.Provider value={{ isDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );
