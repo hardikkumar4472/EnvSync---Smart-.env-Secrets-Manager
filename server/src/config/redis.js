@@ -25,7 +25,7 @@ redisConnection.on('error', (err) => {
 });
 
 redisConnection.on('connect', () => {
-  console.log('Successfully connected to Upstash Redis');
+  console.log('Successfully connected to Redis instance');
 });
 
 module.exports = {

@@ -1,9 +1,7 @@
-const { Queue } = require('bullmq');
-const { redisConnection } = require('../config/redis');
+const Queue = require('bull');
+const { REDIS_URL } = require('../config/redis');
 
-const auditQueue = new Queue('auditLogs', {
-  connection: redisConnection
-});
+const auditQueue = new Queue('auditLogs', REDIS_URL);
 
 const addAuditJob = async (data) => {
   await auditQueue.add('log', data, {

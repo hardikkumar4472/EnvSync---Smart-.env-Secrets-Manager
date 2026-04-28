@@ -3,7 +3,7 @@ const cors = require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const { redisConnection } = require("./config/redis");
-const RedisStore = require("connect-redis").default;
+const { RedisStore } = require("connect-redis");
 
 const app = express();
 
