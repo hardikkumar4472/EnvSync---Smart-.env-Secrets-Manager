@@ -16,14 +16,19 @@ mongoose
   .then(async () => {
     console.log("MongoDB connected");
     
-    // Initialize BullMQ System
-    initAuditWorker();
-    initMaintenanceWorker();
-    await initMaintenanceJobs();
-
-    server.listen(PORT, () =>
+    // Start Server immediately
+    server.listen(PORT, '0.0.0.0', () =>
       console.log(`EnvSync API running on port ${PORT}`)
     );
+
+    // Initialize Background Jobs (Async)
+    try {
+      initAuditWorker();
+      initMaintenanceWorker();
+      await initMaintenanceJobs();
+    } catch (err) {
+      console.error("Background system initialization failed:", err.message);
+    }
   })
   .catch((err) => {
     console.error("DB connection failed", err);
