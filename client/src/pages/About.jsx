@@ -137,7 +137,6 @@ const About = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/register" className="btn-purple !py-4 sm:!py-5 !px-8 sm:!px-10 text-base sm:text-lg group w-full sm:w-auto">
                 <span>Deploy EnvSync Now</span>
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link to="/app/documentation" className="btn-glass !py-4 sm:!py-5 !px-8 sm:!px-10 text-base sm:text-lg flex items-center space-x-2 w-full sm:w-auto justify-center">
                 <Terminal className="w-5 h-5" />
