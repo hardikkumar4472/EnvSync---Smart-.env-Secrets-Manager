@@ -18,7 +18,8 @@ import {
   Server,
   ShieldCheck,
   ShieldAlert,
-  Cpu
+  Cpu,
+  UserPlus
 } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
 import { DashboardSkeleton } from '../components/Skeleton';
@@ -138,22 +139,22 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div
                 key={index}
-                className={`hero-glass-card p-7 group transition-all duration-500 hover:scale-[1.02] hover:bg-white/10 relative overflow-hidden border-white/5 ${stat.glow}`}
+                className={`hero-glass-card p-6 sm:p-7 group transition-all duration-500 hover:scale-[1.02] hover:bg-white/10 relative overflow-hidden border-white/5 ${stat.glow}`}
               >
                 {/* Background Pattern */}
                 <div className={`absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500`}>
-                   <Icon className="w-32 h-32" />
+                   <Icon className="w-24 h-24 sm:w-32 sm:h-32" />
                 </div>
 
-                <div className="flex items-center justify-between mb-6 relative z-10">
-                  <div className={`p-3.5 rounded-2xl ${stat.bg} border ${stat.border} ${stat.color} shadow-inner`}>
-                    <Icon className="w-6 h-6" />
+                <div className="flex items-center justify-between mb-4 sm:mb-6 relative z-10">
+                  <div className={`p-3 sm:p-3.5 rounded-2xl ${stat.bg} border ${stat.border} ${stat.color} shadow-inner`}>
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div className="flex flex-col items-end">
                      <span className="text-[10px] font-black text-white/10 uppercase tracking-widest">REG_{index + 104}</span>
@@ -161,8 +162,8 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="relative z-10">
-                  <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-1.5">{stat.title}</p>
-                  <p className="text-4xl font-black text-white tracking-tighter flex items-baseline">
+                  <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 sm:mb-1.5">{stat.title}</p>
+                  <p className="text-3xl sm:text-4xl font-black text-white tracking-tighter flex items-baseline">
                     {stat.value}
                     {stat.title === 'Node Status' && <span className="ml-2 w-2 h-2 rounded-full bg-emerald-500 animate-ping" />}
                   </p>
@@ -332,7 +333,5 @@ const Dashboard = () => {
     </PageTransition>
   );
 };
-
-export default Dashboard;
 
 export default Dashboard;

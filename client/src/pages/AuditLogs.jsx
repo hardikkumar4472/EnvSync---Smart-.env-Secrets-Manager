@@ -59,16 +59,16 @@ const AuditLogs = () => {
     <PageTransition>
       <div className="space-y-10 pb-20">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_12px_rgba(239,68,68,1)]" />
               <span className="text-[10px] uppercase font-black tracking-[0.4em] text-white/40">Compliance / Activity_Log</span>
             </div>
-            <h1 className="text-5xl font-black text-white tracking-tighter">Security Ledger</h1>
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">Security Ledger</h1>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-             <div className="relative group w-full sm:w-64">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+             <div className="relative group w-full lg:w-64">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-red-500 transition-colors" />
                 <input 
                   type="text" 
@@ -80,7 +80,7 @@ const AuditLogs = () => {
              </div>
              <button
                onClick={fetchLogs}
-               className="btn-glass px-6 py-3.5 flex items-center space-x-3 text-white/60 hover:text-white transition-all group"
+               className="btn-glass px-6 py-3.5 flex items-center justify-center space-x-3 text-white/60 hover:text-white transition-all group w-full sm:w-auto"
              >
                <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-700" />
                <span className="text-[10px] uppercase font-black tracking-[0.2em]">Resync Ledger</span>

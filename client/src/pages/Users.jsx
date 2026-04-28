@@ -17,7 +17,8 @@ import {
   Activity,
   Clock,
   Eye,
-  ChevronRight
+  ChevronRight,
+  Plus
 } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
 
@@ -160,20 +161,20 @@ const Users = () => {
     <PageTransition>
       <div className="space-y-10 pb-20">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_12px_rgba(6,182,212,1)]" />
               <span className="text-[10px] uppercase font-black tracking-[0.4em] text-white/40">Entities / Personnel_Data</span>
             </div>
-            <h1 className="text-5xl font-black text-white tracking-tighter">Identity Management</h1>
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">Identity Management</h1>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="btn-purple px-10 py-4 flex items-center justify-center space-x-3 shadow-xl shadow-purple-500/20 w-full md:w-auto group overflow-hidden relative"
+            className="btn-purple px-8 sm:px-10 py-4 flex items-center justify-center space-x-3 shadow-xl shadow-purple-500/20 w-full lg:w-auto group overflow-hidden relative"
           >
             <UserPlus className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            <span className="font-black uppercase tracking-widest text-xs">Establish New Entity</span>
+            <span className="font-black uppercase tracking-widest text-[10px] sm:text-xs">Establish New Entity</span>
           </button>
         </div>
 

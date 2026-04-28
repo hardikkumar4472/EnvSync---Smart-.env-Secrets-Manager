@@ -262,15 +262,15 @@ Password: ******
     <PageTransition>
       <div className="space-y-10 pb-20">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,1)]" />
               <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40">Secure Shell / Interface</span>
             </div>
-            <h1 className="text-4xl font-black text-white tracking-tighter">CLI Protocols</h1>
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">CLI Protocols</h1>
           </div>
-          <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 w-fit">
             <Code className="w-4 h-4 text-purple-400" />
             <span className="text-[10px] uppercase font-black tracking-widest text-white/60 font-mono">ENVSYNC_V2.0.0</span>
           </div>

@@ -274,16 +274,16 @@ const Secrets = () => {
     <PageTransition>
       <div className="space-y-10 pb-20">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_12px_rgba(6,182,212,1)]" />
               <span className="text-[10px] uppercase font-black tracking-[0.4em] text-white/40">Secrets / Identity_Vault</span>
             </div>
-            <h1 className="text-5xl font-black text-white tracking-tighter">Identity Secrets</h1>
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter">Identity Secrets</h1>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="relative group w-full sm:w-64">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <div className="relative group w-full lg:w-64">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-cyan-400 transition-colors" />
                 <input 
                   type="text" 
@@ -294,22 +294,22 @@ const Secrets = () => {
                 />
             </div>
             {isAdmin && (
-              <>
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => { setShowBulkModal(true); setImportMode('upload'); }}
-                  className="btn-glass px-6 py-4 text-cyan-400 flex items-center space-x-3 group relative overflow-hidden"
+                  className="btn-glass px-6 py-4 text-cyan-400 flex items-center justify-center space-x-3 group relative overflow-hidden"
                 >
                   <FileUp className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
                   <span className="text-[10px] uppercase font-black tracking-[0.2em]">Bulk Import</span>
                 </button>
                 <button
                   onClick={() => setShowModal(true)}
-                  className="btn-purple px-10 py-4 flex items-center space-x-3 shadow-xl shadow-purple-500/20 group"
+                  className="btn-purple px-8 sm:px-10 py-4 flex items-center justify-center space-x-3 shadow-xl shadow-purple-500/20 group w-full sm:w-auto"
                 >
                   <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                  <span className="text-xs font-black uppercase tracking-widest">New Secret</span>
+                  <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest">New Secret</span>
                 </button>
-              </>
+              </div>
             )}
           </div>
         </div>

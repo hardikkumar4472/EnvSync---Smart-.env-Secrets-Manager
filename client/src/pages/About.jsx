@@ -91,55 +91,55 @@ const About = () => {
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-        <div className="glass-header mx-auto max-w-7xl mt-4 rounded-2xl px-6 py-4 flex items-center justify-between border border-white/5 mx-4 sm:mx-6">
-          <div className="flex items-center space-x-3 group cursor-pointer">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-600 p-2 shadow-lg shadow-cyan-500/20 group-hover:rotate-12 transition-transform">
+        <div className="glass-header mx-auto max-w-7xl mt-4 rounded-2xl px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border border-white/5 mx-4 sm:mx-6">
+          <div className="flex items-center space-x-2 sm:space-x-3 group cursor-pointer">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-600 p-1.5 sm:p-2 shadow-lg shadow-cyan-500/20 group-hover:rotate-12 transition-transform">
               <Shield className="text-white w-full h-full" />
             </div>
-            <span className="text-xl font-black text-white tracking-tight">EnvSync</span>
+            <span className="text-lg sm:text-xl font-black text-white tracking-tight">EnvSync</span>
           </div>
 
           <nav className="hidden lg:flex items-center space-x-8">
-            <Link to="/app/documentation" className="text-white/60 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider">Features</Link>
-            <Link to="/app/documentation" className="text-white/60 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider">Security</Link>
-            <Link to="/app/documentation" className="text-white/60 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider">CLI</Link>
-            <Link to="/app/documentation" className="text-white/60 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider">Docs</Link>
+            <a href="#features" className="text-white/60 hover:text-white transition-colors text-xs sm:text-sm font-medium uppercase tracking-wider">Features</a>
+            <a href="#security" className="text-white/60 hover:text-white transition-colors text-xs sm:text-sm font-medium uppercase tracking-wider">Security</a>
+            <Link to="/app/cli-commands" className="text-white/60 hover:text-white transition-colors text-xs sm:text-sm font-medium uppercase tracking-wider">CLI</Link>
+            <Link to="/app/documentation" className="text-white/60 hover:text-white transition-colors text-xs sm:text-sm font-medium uppercase tracking-wider">Docs</Link>
           </nav>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <button 
               onClick={() => setIsDevModalOpen(true)}
               className="p-2 text-white/60 hover:text-white transition-colors rounded-xl bg-white/5 border border-white/10"
               title="Developer Profile"
             >
-              <User className="w-5 h-5" />
+              <User className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-            <Link to="/login" className="hidden sm:block text-white/80 hover:text-white transition-colors font-bold text-sm px-4">Log In</Link>
-            <Link to="/register" className="btn-purple !py-2.5 !px-6 text-sm whitespace-nowrap">Get Started</Link>
+            <Link to="/login" className="hidden xs:block text-white/80 hover:text-white transition-colors font-bold text-xs sm:text-sm px-2 sm:px-4">Log In</Link>
+            <Link to="/register" className="btn-purple !py-2 sm:!py-2.5 !px-4 sm:!px-6 text-xs sm:text-sm whitespace-nowrap">Get Started</Link>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 pt-40 pb-32 px-6">
+      <main className="relative z-10 pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           
           {/* Hero Section */}
-          <div className="text-center mb-32 fade-in-down">
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tighter leading-[0.9] text-balance">
+          <div className="text-center mb-20 sm:mb-32 fade-in-down">
+            <h1 className="text-4xl sm:text-7xl lg:text-8xl font-black text-white mb-6 sm:mb-8 tracking-tighter leading-[0.9] text-balance">
               Secrets are better <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500">Left in Memory.</span>
             </h1>
-            <p className="text-lg sm:text-xl text-white/50 max-w-3xl mx-auto mb-12 leading-relaxed">
+            <p className="text-base sm:text-xl text-white/50 max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed">
               Ditch the insecure <code className="text-red-400/80 bg-red-400/5 px-2 py-0.5 rounded">.env</code> files. 
               Inject production secrets directly into your runtime via secure encrypted tunnels. 
               Built for teams that take security seriously.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/register" className="btn-purple !py-5 !px-10 text-lg group w-full sm:w-auto">
+              <Link to="/register" className="btn-purple !py-4 sm:!py-5 !px-8 sm:!px-10 text-base sm:text-lg group w-full sm:w-auto">
                 <span>Deploy EnvSync Now</span>
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/app/documentation" className="btn-glass !py-5 !px-10 text-lg flex items-center space-x-2 w-full sm:w-auto">
+              <Link to="/app/documentation" className="btn-glass !py-4 sm:!py-5 !px-8 sm:!px-10 text-base sm:text-lg flex items-center space-x-2 w-full sm:w-auto justify-center">
                 <Terminal className="w-5 h-5" />
                 <span>Try the CLI</span>
               </Link>
@@ -224,7 +224,7 @@ const About = () => {
           </div>
 
           {/* Features Grid */}
-          <div className="mb-40">
+          <div id="features" className="mb-40 scroll-mt-32">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-black text-white mb-4">Core Infrastructure</h2>
               <p className="text-white/40">Built with zero-trust principles for high-compliance environments.</p>
@@ -276,7 +276,7 @@ const About = () => {
           </div>
 
           {/* Flow Section */}
-          <div className="hero-glass-card p-16 mb-40 relative overflow-hidden group">
+          <div id="security" className="hero-glass-card p-16 mb-40 relative overflow-hidden group scroll-mt-32">
             <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 blur-[100px] -mr-48 -mt-48 group-hover:bg-cyan-500/20 transition-all duration-700" />
             <h2 className="text-4xl font-black text-white mb-20 text-center">Seamless Lifecycle</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
@@ -330,7 +330,7 @@ const About = () => {
                 </div>
                 
                 <h2 className="text-3xl font-black text-white mb-1">Hardik Kumar</h2>
-                <p className="text-cyan-400 font-bold uppercase tracking-widest text-xs mb-6">Lead Architect @ EnvSync</p>
+                <p className="text-cyan-400 font-bold uppercase tracking-widest text-xs mb-6">Software Developer</p>
                 
                 <div className="space-y-3">
                   <a href="mailto:hardikv715@gmail.com" className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all group">

@@ -56,7 +56,7 @@ const Layout = () => {
             {/* Logo Section */}
             <div className="flex items-center space-x-3">
               <Link to="/app/dashboard" className="flex items-center space-x-2.5 group">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 shadow-lg group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all overflow-hidden p-1.5 relative">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 shadow-lg group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all overflow-hidden p-1.5 relative">
                   <img 
                     src="/logo.svg" 
                     alt="EnvSync Logo" 
@@ -64,14 +64,14 @@ const Layout = () => {
                   />
                 </div>
                 <div>
-                  <h1 className="text-xl font-black text-white tracking-tighter leading-none">EnvSync</h1>
-                  <span className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-black">Industrial Protocol</span>
+                  <h1 className="text-lg sm:text-xl font-black text-white tracking-tighter leading-none">EnvSync</h1>
+                  <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] text-white/40 font-black">Industrial Protocol</span>
                 </div>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-2">
+            <nav className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -79,14 +79,14 @@ const Layout = () => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-2.5 px-4 py-2.5 rounded-xl transition-all group border ${
+                    className={`flex items-center space-x-2 px-3 lg:px-4 py-2 rounded-xl transition-all group border ${
                       isActive 
                         ? 'bg-white/10 text-white border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.05)]' 
                         : 'text-white/40 border-transparent hover:text-white hover:bg-white/5 hover:border-white/10'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-cyan-400' : 'group-hover:text-cyan-400'}`} />
-                    <span className="text-[11px] font-black tracking-widest uppercase">{item.label}</span>
+                    <Icon className={`w-3.5 h-3.5 transition-colors ${isActive ? 'text-cyan-400' : 'group-hover:text-cyan-400'}`} />
+                    <span className="text-[10px] font-black tracking-widest uppercase">{item.label}</span>
                   </Link>
                 );
               })}
@@ -94,8 +94,6 @@ const Layout = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Removed theme toggle for locked dark theme */}
-
               {/* User Dropdown Container */}
               <div className="relative">
                 <button
@@ -109,8 +107,8 @@ const Layout = () => {
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center">
                     <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
                   </div>
-                  <div className="hidden sm:block text-left">
-                    <p className="text-[11px] font-black text-white leading-none truncate max-w-[120px]">{user?.email?.split('@')[0]}</p>
+                  <div className="hidden xs:block text-left">
+                    <p className="text-[10px] sm:text-[11px] font-black text-white leading-none truncate max-w-[80px] sm:max-w-[120px]">{user?.email?.split('@')[0]}</p>
                     <div className="flex items-center space-x-1 mt-0.5">
                        <div className="w-1 h-1 rounded-full bg-cyan-500" />
                        <p className="text-[8px] uppercase font-black text-white/30 tracking-[0.1em]">{user?.role}</p>
@@ -152,7 +150,7 @@ const Layout = () => {
               {/* Mobile Menu Icon */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 sm:p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white"
+                className="lg:hidden p-2 sm:p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
@@ -164,11 +162,11 @@ const Layout = () => {
         {mobileMenuOpen && (
           <>
             <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] md:hidden" 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] lg:hidden" 
               onClick={() => setMobileMenuOpen(false)}
             />
             
-            <div className="md:hidden fixed top-16 sm:top-20 left-0 w-full bg-[#0A0A0A] border-t border-white/10 shadow-2xl z-[200] animate-in slide-in-from-top duration-300">
+            <div className="lg:hidden fixed top-16 sm:top-20 left-0 w-full bg-[#0A0A0A] border-t border-white/10 shadow-2xl z-[200] animate-in slide-in-from-top duration-300">
               <div className="p-4 space-y-2 max-h-[80vh] overflow-y-auto custom-scrollbar">
                 <div className="px-5 py-2 mb-2">
                   <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Protocol Navigation</p>
@@ -194,7 +192,6 @@ const Layout = () => {
                 })}
                 
                 <div className="pt-4 mt-4 border-t border-white/5 space-y-2">
-              {/* Removed theme toggle for locked dark theme */}
                   <button
                     onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
                     className="flex items-center space-x-4 w-full px-5 py-4 rounded-xl text-red-500/60 hover:bg-red-500/10 transition-all text-sm font-black uppercase tracking-widest"
@@ -210,17 +207,17 @@ const Layout = () => {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 relative z-10 pt-24 sm:pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full overflow-y-auto custom-scrollbar">
+      <main className="flex-1 relative z-10 pt-24 sm:pt-32 pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <Outlet />
       </main>
 
       {/* Industrial Status Footer */}
-      <footer className="fixed bottom-0 left-0 w-full p-6 pointer-events-none flex justify-between items-end z-40">
-        <div className="flex items-center space-x-3 px-5 py-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl">
-           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-           <span className="text-[9px] uppercase font-black tracking-[0.4em] text-white/60">System Link Active</span>
+      <footer className="fixed bottom-0 left-0 w-full p-4 sm:p-6 pointer-events-none flex justify-between items-end z-40">
+        <div className="flex items-center space-x-3 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl">
+           <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse" />
+           <span className="text-[8px] sm:text-[9px] uppercase font-black tracking-[0.4em] text-white/60">System Link Active</span>
         </div>
-        <div className="hidden md:flex items-center space-x-4 px-5 py-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl">
+        <div className="hidden sm:flex items-center space-x-4 px-5 py-2.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl">
            <div className="flex items-center space-x-2">
               <Shield className="w-3 h-3 text-cyan-400" />
               <span className="text-[9px] uppercase font-black tracking-[0.4em] text-white/40">AES_256_GCM</span>

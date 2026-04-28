@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { 
   BookOpen, Shield, Code, Users, Key, FileText, Terminal, 
   ArrowLeft, Moon, Sun, ChevronDown, Zap, Cpu, Lock, 
-  Globe, Activity, ShieldCheck, Database, Layout, Server
+  Globe, Activity, ShieldCheck, Database, Layout, Server,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -21,42 +22,42 @@ const Documentation = () => {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/[0.03] blur-[120px] pointer-events-none" />
 
         {/* Header - Integrated with App Theme */}
-        <header className="glass-header px-8 py-6 sticky top-0 z-50 backdrop-blur-xl border-b border-white/5">
+        <header className="glass-header px-4 sm:px-8 py-4 sm:py-6 sticky top-0 z-50 backdrop-blur-xl border-b border-white/5">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-cyan-500 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all">
-                <Shield className="w-7 h-7 text-black" />
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <Shield className="w-5 h-5 sm:w-7 sm:h-7 text-black" />
               </div>
               <div className="flex flex-col">
-                 <span className="text-2xl font-black tracking-tighter text-white leading-none">EnvSync</span>
-                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mt-1">System_Protocol</span>
+                 <span className="text-xl sm:text-2xl font-black tracking-tighter text-white leading-none">EnvSync</span>
+                 <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mt-1">System_Protocol</span>
               </div>
             </div>
 
-            <div className="flex items-center space-x-8">
-              <Link to="/" className="text-white/40 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest flex items-center space-x-2 group">
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                <span>Return to Central</span>
+            <div className="flex items-center space-x-4 sm:space-x-8">
+              <Link to="/" className="text-white/40 hover:text-white transition-all font-black text-[8px] sm:text-[10px] uppercase tracking-widest flex items-center space-x-2 group">
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform" />
+                <span className="hidden xs:inline">Return to Central</span>
               </Link>
-              <div className="h-8 w-px bg-white/10" />
+              <div className="h-6 sm:h-8 w-px bg-white/10" />
               <button
                 onClick={toggleDarkMode}
-                className="w-10 h-10 rounded-xl transition-all bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white/60"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl transition-all bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white/60"
               >
-                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                {isDarkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
             </div>
           </div>
         </header>
 
         {/* Hero Section */}
-        <main className="relative z-10 max-w-7xl mx-auto px-8 pt-20 space-y-24">
+        <main className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 pt-12 sm:pt-20 space-y-16 sm:space-y-24">
           <div className="text-center space-y-6">
             <div className="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-cyan-500/5 border border-cyan-500/20 text-cyan-400 mb-4 animate-pulse">
                <Zap className="w-4 h-4" />
                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Live Documentation Shards</span>
             </div>
-            <h1 className="text-7xl font-black text-white tracking-tighter leading-none">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-tight sm:leading-none">
               Operational <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">Manual</span>
             </h1>
             <p className="text-lg text-white/40 max-w-3xl mx-auto font-medium leading-relaxed">
